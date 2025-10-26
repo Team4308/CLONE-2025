@@ -36,7 +36,7 @@ public class Robot extends LoggedRobot {
   private Timer disabledTimer;
 
   public Robot() {
-    Logger.recordMetadata("4308Reefscape", Integer.toString(DriverStation.getMatchNumber())); // Set a metadata value
+    Logger.recordMetadata("4308Overtime", Integer.toString(DriverStation.getMatchNumber())); // Set a metadata value
 
     if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
@@ -122,7 +122,6 @@ public class Robot extends LoggedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
-      m_robotContainer.getLEDSystem().setLedState("Auto");
       m_autonomousCommand.schedule();
     }
   }
@@ -142,7 +141,6 @@ public class Robot extends LoggedRobot {
     } else {
       CommandScheduler.getInstance().cancelAll();
     }
-    m_robotContainer.getLEDSystem().setLedState("Teleop");
     m_robotContainer.teleopInit();
   }
 
@@ -159,7 +157,6 @@ public class Robot extends LoggedRobot {
   public void testInit() {
 
     // Cancels all running commands at the start of test mode.
-    m_robotContainer.getLEDSystem().setLedState("Test");
     CommandScheduler.getInstance().cancelAll();
 
     m_robotContainer.runSystemsCheck();
@@ -175,8 +172,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {
-    // Force LED updates in simulation
-    m_robotContainer.getLEDSystem().periodic();
     m_robotContainer.simulationPerodic();
   }
 }

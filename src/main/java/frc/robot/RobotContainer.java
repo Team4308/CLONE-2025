@@ -6,16 +6,12 @@ package frc.robot;
 
 import java.io.File;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.XBoxWrapper;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -23,38 +19,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
-import frc.robot.Constants.constEndEffector;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.Reset;
-import frc.robot.commands.SystemsCheck;
-import frc.robot.commands.Auton.L3A1Stage1;
-import frc.robot.commands.Auton.L3A1Stage2;
-import frc.robot.commands.ButtonBindings.Algae1PreMove;
-import frc.robot.commands.ButtonBindings.Algae2PreMove;
-import frc.robot.commands.ButtonBindings.L2Algae1;
-import frc.robot.commands.ButtonBindings.L2Algae2;
-import frc.robot.commands.ButtonBindings.L2PreMove;
-import frc.robot.commands.ButtonBindings.L3Algae1;
-import frc.robot.commands.ButtonBindings.L3Algae2;
-import frc.robot.commands.ButtonBindings.L3PreMove;
-import frc.robot.commands.CoralScoring.FastL1;
-import frc.robot.commands.CoralScoring.FastL2;
-import frc.robot.commands.CoralScoring.FastL3;
-import frc.robot.commands.DefaultControl.DefaultAlgae;
-import frc.robot.commands.DefaultControl.DefaultElevator;
-import frc.robot.commands.DefaultControl.DefaultRoller;
-import frc.robot.commands.SimpleControl.SimpleAlgae;
-import frc.robot.commands.SimpleControl.SimpleElevator;
-import frc.robot.subsystems.AlgaeArmSubsystem;
-import frc.robot.subsystems.CoralRollerSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.LEDSystem;
+
 import frc.robot.subsystems.Simulation;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -67,23 +36,13 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
-        private final LEDSystem m_ledSubsystem;
-        private final ElevatorSubsystem m_ElevatorSubsystem;
-        private final AlgaeArmSubsystem m_AlgaeArmSubsystem;
-        private final CoralRollerSubsystem m_CoralRollerSubsystem;
-
+       
         // Commands
-        private final DefaultRoller DefaultRollerCommand;
-        private final DefaultAlgae DefaultAlgaeCommand;
-        private final DefaultElevator DefaultElevatorCommand;
-
-        private final L3Algae1 L3A1Command;
 
         private final SendableChooser<Command> autoChooser;
 
         private final Simulation m_simulation;
 
-        private final Trigger coralIntakeTrigger;
         private final Trigger drivebaseAlignedTrigger;
 
         // Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -127,30 +86,9 @@ public class RobotContainer {
         SwerveInputStream driveToClosestRightReef = driveDirectAngle.copy();
 
         public RobotContainer() {
-                m_ledSubsystem = new LEDSystem(RobotContainer.this);
-                m_ElevatorSubsystem = new ElevatorSubsystem();
-                m_ledSubsystem.setElevator(m_ElevatorSubsystem);
-                m_AlgaeArmSubsystem = new AlgaeArmSubsystem();
-                m_CoralRollerSubsystem = new CoralRollerSubsystem();
+ 
                 m_simulation = new Simulation();
-                m_simulation.setupsubsystems(m_ElevatorSubsystem, m_AlgaeArmSubsystem, m_CoralRollerSubsystem);
 
-                DefaultRollerCommand = new DefaultRoller(() -> triggerRollerControl(), m_CoralRollerSubsystem);
-                DefaultAlgaeCommand = new DefaultAlgae(() -> joystickAlgaeArm(), m_AlgaeArmSubsystem);
-                DefaultElevatorCommand = new DefaultElevator(() -> joystickElevatorControl(), m_ElevatorSubsystem);
-
-                L3A1Command = new L3Algae1(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem);
-
-                m_AlgaeArmSubsystem.setDefaultCommand(DefaultAlgaeCommand);
-                m_CoralRollerSubsystem.setDefaultCommand(DefaultRollerCommand);
-                m_ElevatorSubsystem.setDefaultCommand(DefaultElevatorCommand);
-
-                CommandScheduler.getInstance().registerSubsystem(m_ledSubsystem);
-                CommandScheduler.getInstance().registerSubsystem(m_ElevatorSubsystem);
-                CommandScheduler.getInstance().registerSubsystem(m_AlgaeArmSubsystem);
-                CommandScheduler.getInstance().registerSubsystem(m_CoralRollerSubsystem);
-
-                coralIntakeTrigger = new Trigger(m_CoralRollerSubsystem::getBeamBreak);
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
 
                 configureNamedCommands();
@@ -199,90 +137,19 @@ public class RobotContainer {
         }
 
         private void configureOperatorBindings() {
-                /*
-                 * elevator failsafe(0,2,3)
-                 * intaking
-                 * auto:
-                 * L2, L3, A1, A2
-                 * L2A1, L2A2, L3A1, L3A2
-                 * manual control roller, elevator, algae
-                 */
-
-                // Automatic Scoring
-                operator.B.onTrue(new Reset(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                operator.A.onTrue(new FastL1(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem,
-                                m_ledSubsystem));
-                operator.X.onTrue(new L2PreMove(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                operator.Y.onTrue(new L3PreMove(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-
-                // Automatic Algae Removal
-                operator.LB
-                                .onTrue(new Algae1PreMove(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-                operator.RB
-                                .onTrue(new Algae2PreMove(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-
-                // Intake
-                operator.Start.onTrue(new IntakeCommand(() -> constEndEffector.rollerSpeeds.DEFAULT_CORAL,
-                                m_CoralRollerSubsystem));
-                operator.Start.onTrue(new SimpleElevator(() -> 0.0, m_ElevatorSubsystem));
-
-                // Dual Cycles
-                operator.X.and(operator.LB)
-                                .onTrue(new L2Algae1(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-                operator.X.and(operator.RB)
-                                .onTrue(new L2Algae2(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-                operator.Y.and(operator.LB)
-                                .onTrue(new L3Algae1(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-                operator.Y.and(operator.RB)
-                                .onTrue(new L3Algae2(m_ElevatorSubsystem, m_CoralRollerSubsystem,
-                                                m_AlgaeArmSubsystem));
-
-                operator.Back.onTrue(new InstantCommand(() -> m_ElevatorSubsystem.setOffset(true)));
-                operator.Back.onFalse(new InstantCommand(() -> m_ElevatorSubsystem.setOffset(false)));
-
-                /*
-                 * L2A3
-                 * shoot, spin to remove
-                 * L3A3
-                 * remove, while aligning to l3 then shoot
-                 */
-
-                // Elevator Failsafe
-                operator.povUp.onTrue(m_ElevatorSubsystem.goToLevel(3));
-                operator.povRight.onTrue(m_ElevatorSubsystem.goToLevel(0));
-                operator.povDown.onTrue(m_ElevatorSubsystem.goToLevel(1));
-                operator.povLeft.onTrue(m_ElevatorSubsystem.goToLevel(2));
-
-                operator.RightStickButton.onTrue(new SimpleAlgae(() -> 30.0, m_AlgaeArmSubsystem));
         }
 
         private void configureOtherTriggers() {
-                coralIntakeTrigger.onTrue(new InstantCommand(() -> m_ledSubsystem.setLedState("Coral")));
-                coralIntakeTrigger.onFalse(new InstantCommand(() -> {
-                        if (m_ledSubsystem.getLedState().equals("Coral")) {
-                                m_ledSubsystem.clearStatus();
-                        }
-                }));
-                drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> m_ledSubsystem.setLedState("Aligned")));
+ 
+                drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> System.out.println("Drivebase Aligned")));
                 drivebaseAlignedTrigger.onFalse(new InstantCommand(() -> {
-                        m_ledSubsystem.clearTemporary();
-                        ;
+   
 
                 }));
         }
 
         public void configureTeleopBindings() {
-                coralIntakeTrigger.onTrue(new RunCommand(() -> driver.setRumble(RumbleType.kBothRumble, 1))
-                                .withTimeout(1.0).finallyDo(() -> driver.setRumble(RumbleType.kBothRumble, 0)));
-                // coralIntakeTrigger.onTrue(new RunCommand(() ->
-                // operator.setRumble(RumbleType.kBothRumble, 1)).withTimeout(1.0).finallyDo(()
-                // -> operator.setRumble(RumbleType.kBothRumble, 0)));
-
+          
                 drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 1)));
                 drivebaseAlignedTrigger
                                 .onFalse(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
@@ -300,38 +167,8 @@ public class RobotContainer {
         }
 
         public void configureNamedCommands() {
-                NamedCommands.registerCommand("Intake Coral",
-                                new IntakeCommand(() -> constEndEffector.rollerSpeeds.DEFAULT_CORAL,
-                                                m_CoralRollerSubsystem));
-                NamedCommands.registerCommand("L2 Preset",
-                                new FastL2(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("L3 Preset",
-                                new FastL3(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("Align To Left Reef",
-                                drivebase.driveToPose(() -> drivebase.getClosestLeftReefPose())
-                                                .until(drivebaseAlignedTrigger));
-                NamedCommands.registerCommand("Align To Right Reef",
-                                drivebase.driveToPose(() -> drivebase.getClosestRightReefPose())
-                                                .until(drivebaseAlignedTrigger));
-                NamedCommands.registerCommand("Align To Far Station",
-                                drivebase.driveToPose(() -> drivebase.getClosestFarCoralStationPose())
-                                                .until(drivebaseAlignedTrigger));
-                NamedCommands.registerCommand("L2 Premove", m_ElevatorSubsystem.goToLevel(2));
-                NamedCommands.registerCommand("L3A1 Stage1",
-                                new L3A1Stage1(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("L3A1 Stage2",
-                                new L3A1Stage2(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("Remove Low Algae and Shoot L2",
-                                new L2Algae1(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("Remove High Algae and Shoot L3",
-                                new L3Algae2(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
-                NamedCommands.registerCommand("Remove High Algae and Shoot L2",
-                                new L2Algae2(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem));
         }
 
-        public LEDSystem getLEDSystem() {
-                return m_ledSubsystem;
-        }
 
         /**
          * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -343,10 +180,7 @@ public class RobotContainer {
         }
 
         public void robotPeriodic() {
-                Logger.recordOutput("Subsystems/Algae/LoggedPose", new Pose3d(
-                                new Translation3d(0.292, -0.2, m_ElevatorSubsystem.getPositionInMeters() + 0.3055),
-                                new Rotation3d(0, Units.degreesToRadians(90)
-                                                - Units.degreesToRadians(m_AlgaeArmSubsystem.getAlgaePosition()), 0)));
+              
         }
 
         public void teleopInit() {
@@ -357,13 +191,11 @@ public class RobotContainer {
         }
 
         public void simulationPerodic() {
-                m_simulation.run();
         }
 
         public void disabledInit() {
                 driver.setRumble(RumbleType.kBothRumble, 0);
                 operator.setRumble(RumbleType.kBothRumble, 0);
-                m_ledSubsystem.setLedState("Idle");
         }
 
         private double joystickAlgaeArm() {
@@ -385,9 +217,7 @@ public class RobotContainer {
         }
 
         public void runSystemsCheck() {
-                new SystemsCheck(m_ElevatorSubsystem, m_CoralRollerSubsystem, m_AlgaeArmSubsystem, drivebase,
-                                m_ledSubsystem)
-                                .schedule();
+
         }
 
         public void setMotorBrake(boolean brake) {
