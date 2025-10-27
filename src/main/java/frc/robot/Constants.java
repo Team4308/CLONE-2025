@@ -1,16 +1,8 @@
 package frc.robot;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import swervelib.math.Matter;
 
 public final class Constants {
@@ -70,11 +62,24 @@ public final class Constants {
         public static final double Pivot_kI = 0.0;
         public static final double Pivot_kD = 0.0;
 
-        public static final double Gear_Ratio = 1/1;
+        // Mech properties
+        public static final double Gear_Ratio = 1.0 / 1.0;
         public static final double Max_Angle = 90.0; 
         public static final double Pivot_EncoderTicksPerRevolution = 4096.0;
+
+        // FF Gains
+        public static final double Pivot_kS = 0.2;
+        public static final double Pivot_kG = 0.9;
+        public static final double Pivot_kV = 1.5;
+        public static final double Pivot_kA = 0.0;
+
+        // Tp Constraints
+        public static final double PivotMaxVelRadPerSec = Math.toRadians(180.0);      // 180 deg/s
+        public static final double PivotMaxAccelRadPerSec2 = Math.toRadians(360.0);   // 360 deg/s^2
+
+        // Controller tolerances
+        public static final double PivotPositionToleranceDeg = 1.0;
+        public static final double PivotVelocityToleranceDegPerSec = 5.0;
     }
-
-
 
 }
