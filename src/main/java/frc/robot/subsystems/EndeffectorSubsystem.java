@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -21,27 +23,27 @@ public class EndeffectorSubsystem extends SubsystemBase {
         config.Slot0.kP = Constants.EndEffector.kP;
         config.Slot0.kI = Constants.EndEffector.kI;
         config.Slot0.kD = Constants.EndEffector.kD;
-        
+
         IntakeMotor.getConfigurator().apply(config);
         CenteringMotor.getConfigurator().apply(config);
-
-
     }
 
     boolean getIntaken() {
         return leftBeam.get() || rightBeam.get();
     }
 
-
     public void Intake() {
-        IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
-        isIntaking = true;
+        if (!getIntaken()) {
+            IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
+            isIntaking = true;
+        }
     }
 
     public void Score() {
-        IntakeMotor.set(-Constants.EndEffector.ScoreSpeed);
+        if (getIntaken()) {
+            IntakeMotor.set(-Constants.EndEffector.ScoreSpeed);
+        }
     }
-
 
     @Override
     public void periodic() {
@@ -50,7 +52,11 @@ public class EndeffectorSubsystem extends SubsystemBase {
             IntakeMotor.set(0);
             isIntaking = false;
         }
-        
+
+        Logger.recordOutput("/Subsystems/EndEffector/LeftBeam", leftBeam.get());
+        Logger.recordOutput("/Subsystems/EndEffector/RightBeam", rightBeam.get());
+        Logger.recordOutput("/Subsystems/EndEffector/Intaken", getIntaken());
+        Logger.recordOutput("/Subsystems/EndEffector/LeftBeam", IntakeMotor.getMotorVoltage().getValueAsDouble());
     }
 
 }

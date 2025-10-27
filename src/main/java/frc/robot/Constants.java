@@ -1,6 +1,5 @@
 package frc.robot;
 
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Translation3d;
 import swervelib.math.Matter;
@@ -64,7 +63,7 @@ public final class Constants {
 
         // Mech properties
         public static final double Gear_Ratio = 1.0 / 1.0;
-        public static final double Max_Angle = 90.0; 
+        public static final double Max_Angle = 90.0;
         public static final double Pivot_EncoderTicksPerRevolution = 4096.0;
 
         // FF Gains
@@ -74,8 +73,10 @@ public final class Constants {
         public static final double Pivot_kA = 0.0;
 
         // Tp Constraints
-        public static final double PivotMaxVelRadPerSec = Math.toRadians(180.0);      // 180 deg/s
-        public static final double PivotMaxAccelRadPerSec2 = Math.toRadians(360.0);   // 360 deg/s^2
+        public static final double PivotMaxVelRadPerSec = Math.toRadians(180.0); // 180 deg/s
+        public static final double PivotMaxAccelRadPerSec2 = Math.toRadians(360.0); // 360 deg/s^2
+
+        public static final double ROTATION_TOLERANCE = 0.01;
 
         // Controller tolerances
         public static final double PivotPositionToleranceDeg = 1.0;
@@ -92,6 +93,5 @@ public final class Constants {
         public static final double kI = 0.0;
         public static final double kD = 0.0;
     }
-
 
 }
