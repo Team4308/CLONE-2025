@@ -9,7 +9,7 @@ public class Ports {
         public static final int OPERATOR = 1;
     }
 
-    public static class Slapdown {
+    public static class Pivot {
         public static final int PivotMotor = 1;
         public static final int PivotEncoder = 2;
 

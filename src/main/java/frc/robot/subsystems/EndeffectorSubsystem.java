@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -14,6 +15,14 @@ public class EndeffectorSubsystem extends SubsystemBase {
     private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightBeam);
 
     public EndeffectorSubsystem() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kP = 0.1;
+        config.Slot0.kI = 0.0;
+        config.Slot0.kD = 0.0;
+        
+        IntakeMotor.getConfigurator().apply(config);
+        CenteringMotor.getConfigurator().apply(config);
+
 
     }
 
@@ -27,6 +36,8 @@ public class EndeffectorSubsystem extends SubsystemBase {
     }
 
     public void Score() {
-        
+
     }
+
+
 }

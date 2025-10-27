@@ -56,7 +56,7 @@ public final class Constants {
         public static final double TURN_CONSTANT = 6;
     }
 
-    public static class Slapdown {
+    public static class Pivot {
         // PID Values
         public static final double Pivot_kP = 0.05;
         public static final double Pivot_kI = 0.0;
