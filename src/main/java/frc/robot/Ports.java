@@ -14,5 +14,10 @@ public class Ports {
         public static final int PivotEncoder = 2; 
         
     }
+
+    public static class Endeffector {
+        public static final int IntakeMotor = 3;
+        public static final int CenteringMotor = 4;
+    }
     
 }

@@ -11,11 +11,11 @@ import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.Constants.Swerve.Auton.Angle;
 
-public class SlapdownSubsystem extends SubsystemBase {
+public class PivotSubsystem extends SubsystemBase {
     public TalonFX PivotMotor = new TalonFX(Ports.Slapdown.PivotMotor);
     public CANcoder PivotEncoder = new CANcoder(Ports.Slapdown.PivotEncoder);
 
-    public SlapdownSubsystem() {
+    public PivotSubsystem() {
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = Constants.Slapdown.Pivot_kP;
         config.Slot0.kI = Constants.Slapdown.Pivot_kI;
