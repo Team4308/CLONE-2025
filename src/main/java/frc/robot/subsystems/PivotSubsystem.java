@@ -31,7 +31,8 @@ public class PivotSubsystem extends SubsystemBase {
 
     public double getPivotAngle() {
         double rawAngle = PivotEncoder.getPosition().getValueAsDouble();
-        double angle = ((rawAngle / Constants.Slapdown.Pivot_EncoderTicksPerRevolution) * 360.0 ) / Constants.Slapdown.Gear_Ratio;
+        double angle = ((rawAngle / Constants.Slapdown.Pivot_EncoderTicksPerRevolution) * 360.0)
+                / Constants.Slapdown.Gear_Ratio;
         return angle;
     }
 

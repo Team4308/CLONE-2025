@@ -11,13 +11,15 @@ public class Ports {
 
     public static class Slapdown {
         public static final int PivotMotor = 1;
-        public static final int PivotEncoder = 2; 
-        
+        public static final int PivotEncoder = 2;
+
     }
 
-    public static class Endeffector {
+    public static class EndEffector {
         public static final int IntakeMotor = 3;
         public static final int CenteringMotor = 4;
+        public static final int leftBeam = 0;
+        public static final int rightBeam = 0;
     }
-    
+
 }
