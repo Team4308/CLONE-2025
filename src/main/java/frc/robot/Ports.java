@@ -22,4 +22,10 @@ public class Ports {
         public static final int rightBeam = 0;
     }
 
+    public static class Climb {
+        public static final int Motor = 5;
+    }
+
+    
+
 }
