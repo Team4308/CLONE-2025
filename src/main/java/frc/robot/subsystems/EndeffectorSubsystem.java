@@ -23,7 +23,6 @@ public class EndeffectorSubsystem extends SubsystemBase {
         config.Slot0.kP = Constants.EndEffector.kP;
         config.Slot0.kI = Constants.EndEffector.kI;
         config.Slot0.kD = Constants.EndEffector.kD;
-
         IntakeMotor.getConfigurator().apply(config);
         CenteringMotor.getConfigurator().apply(config);
     }
@@ -43,6 +42,19 @@ public class EndeffectorSubsystem extends SubsystemBase {
         if (getIntaken()) {
             IntakeMotor.set(-Constants.EndEffector.ScoreSpeed);
         }
+    }
+
+    public void CenterCoral() {
+        CenteringMotor.set(Constants.EndEffector.CenteringSpeed);
+    }
+
+    public void StopCentering() {
+        CenteringMotor.set(0);
+    }
+
+    public void StopMotors() {
+        IntakeMotor.set(0);
+        CenteringMotor.set(0);
     }
 
     @Override

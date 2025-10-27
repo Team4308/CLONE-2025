@@ -79,11 +79,10 @@ public class PivotSubsystem extends SubsystemBase {
         /*
          * the sensor is set such at 0 is horizontal (mechanism), and 1 is straight up
          * 
-         * TO DO: fix math
+         *
          */
         double rawAngle = m_pivotEncoder.getPosition().getValueAsDouble();
-        double angle = ((rawAngle / Constants.Pivot.Pivot_EncoderTicksPerRevolution) * 360.0)
-                / Constants.Pivot.Gear_Ratio;
+        double angle =  ((rawAngle / Constants.Pivot.Pivot_EncoderTicksPerRevolution) / Constants.Pivot.Gear_Ratio) * 360.0;
         return angle;
     }
 

@@ -87,6 +87,7 @@ public final class Constants {
         // Motor Speeds (0-1)
         public static final double IntakeSpeed = 0.5;
         public static final double ScoreSpeed = -0.25;
+        public static final double CenteringSpeed = 0.3;
 
         // Motor PID Values
         public static final double kP = 0.1;
