@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -424,19 +425,27 @@ public class SwerveSubsystem extends SubsystemBase {
         .until(() -> swerveDrive.getPose().getTranslation().getDistance(new Translation2d(0, 0)) > distanceInMeters);
   }
 
-  public Command aimAtTarget(Cameras camera) {
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent()) {
-        var result = resultO.get();
-        if (result.hasTargets()) {
-          drive(getTargetSpeeds(0,
+  public void aimAtTarget(Supplier<Double> joyX, Supplier<Double> joyY) {
+    OptionalDouble yawDiff = vision.getObjectOffset().get();
+    if (!yawDiff.isEmpty())
+      swerveDrive.driveFieldOriented(
+          getTargetSpeeds(
+              joyY.get(),
+              joyX.get(),
+              new Rotation2d(
+                  Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble()))));
+  }
+
+  public void driveTowardsTarget(Supplier<Double> throttle) {
+    OptionalDouble yawDiff = vision.getObjectOffset().get();
+    if (!yawDiff.isEmpty()) {
+      swerveDrive.drive(
+          getTargetSpeeds(
+              -throttle.get(),
               0,
-              Rotation2d.fromDegrees(result.getBestTarget()
-                  .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
+              new Rotation2d(
+                  Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble()))));
+    }
   }
 
   // Swerve drive with Setpoint Generator from 254, implemented by PathPlanner

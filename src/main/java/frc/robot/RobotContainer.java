@@ -130,7 +130,10 @@ public class RobotContainer {
 
                 driver.Y.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
                 driver.Y.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
-                // driver.Y.whileTrue(); // CORAL ALIGN
+
+                driver.Y.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
+                                () -> deadZone(driver.getRightTrigger())),
+                                drivebase));
 
                 driver.X.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
@@ -183,7 +186,6 @@ public class RobotContainer {
         }
 
         public void simulationPerodic() {
-                // m_pivotSubsystem.setPivotTarget(joystickPivot());
         }
 
         public void disabledInit() {

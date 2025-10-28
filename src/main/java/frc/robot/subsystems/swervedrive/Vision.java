@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -57,6 +58,8 @@ public class Vision {
   // Current pose from the pose estimator using wheel odometry.
   private Supplier<Pose2d> currentPose;
   private Field2d field2d;
+
+  PhotonCamera objCamera = new PhotonCamera("COLOR CAM");
 
   /**
    * Constructor for the Vision class.
@@ -128,6 +131,15 @@ public class Vision {
       }
     }
 
+  }
+
+  public Supplier<OptionalDouble> getObjectOffset() {
+    var results = objCamera.getLatestResult();
+    if (results.hasTargets()) {
+      var target = results.getBestTarget();
+      return () -> OptionalDouble.of(target.getYaw());
+    }
+    return () -> OptionalDouble.empty();
   }
 
   /**

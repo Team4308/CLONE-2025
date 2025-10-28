@@ -75,7 +75,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         Logger.recordOutput("Subsystems/EndEffector/LeftBeam", (boolean) leftBeam.get());
         Logger.recordOutput("Subsystems/EndEffector/RightBeam", (boolean) rightBeam.get());
         Logger.recordOutput("Subsystems/EndEffector/Intaken", getIntaken());
-        Logger.recordOutput("Subsystems/EndEffector/LeftBeam", IntakeMotor.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Subsystems/EndEffector/IntakeVoltage", IntakeMotor.getMotorVoltage().getValueAsDouble());
     }
 
 }

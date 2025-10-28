@@ -13,6 +13,8 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.ColorSensorV3.RawColor;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
@@ -31,6 +33,9 @@ public class PivotSubsystem extends SubsystemBase {
 
     private boolean atPosition = false;
     private double targetRotations = 0;
+
+    public TalonFXSimState m_pivotMotorSim;
+    public CANcoderSimState m_pivotEncoderSim;
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
@@ -72,6 +77,9 @@ public class PivotSubsystem extends SubsystemBase {
         canConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         m_pivotEncoder.getConfigurator().apply(canConfig);
+
+        m_pivotMotorSim = m_pivotMotor.getSimState();
+        m_pivotEncoderSim = m_pivotEncoder.getSimState();
     }
 
     public void setPivotTarget(double angle) {
@@ -92,7 +100,7 @@ public class PivotSubsystem extends SubsystemBase {
          */
 
         if (Robot.isSimulation()) {
-            m_pivotEncoder.setPosition(simEncoderVal);
+            // m_pivotEncoder.setPosition(simEncoderVal, 0.001);
         }
 
         double rawAngle = m_pivotEncoder.getPosition().getValueAsDouble();
@@ -122,7 +130,7 @@ public class PivotSubsystem extends SubsystemBase {
         Logger.recordOutput("Subsystems/Pivot/AtTArget", atPosition);
         Logger.recordOutput("Subsystems/Pivot/TargetPos", targetRotations);
         Logger.recordOutput("Subsystems/Pivot/CurPos", currentRotations);
-        Logger.recordOutput("Subsystems/Pivot/Degrees", getPivotAngle());
+        Logger.recordOutput("Subsystems/Pivot/Degrees", currentRotations * 90);
         Logger.recordOutput("Subsystems/Pivot/Voltage", m_pivotMotor.getMotorVoltage().getValueAsDouble());
     }
 }
