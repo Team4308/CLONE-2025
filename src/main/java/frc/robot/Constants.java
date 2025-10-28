@@ -76,7 +76,7 @@ public final class Constants {
         public static final double PivotMaxVelRadPerSec = Math.toRadians(180.0); // 180 deg/s
         public static final double PivotMaxAccelRadPerSec2 = Math.toRadians(360.0); // 360 deg/s^2
 
-        public static final double ROTATION_TOLERANCE = 0.01;
+        public static final double ROTATION_TOLERANCE = 0.1;
 
         // Controller tolerances
         public static final double PivotPositionToleranceDeg = 1.0;

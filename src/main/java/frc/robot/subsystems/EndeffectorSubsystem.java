@@ -10,15 +10,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Ports;
 
-public class EndeffectorSubsystem extends SubsystemBase {
+public class EndEffectorSubsystem extends SubsystemBase {
 
     private TalonFX IntakeMotor = new TalonFX(Ports.EndEffector.IntakeMotor);
     private TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
-    private DigitalInput leftBeam = new DigitalInput(Ports.EndEffector.leftBeam);
-    private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightBeam);
+    private DigitalInput leftBeam = new DigitalInput(Ports.EndEffector.leftDIO);
+    private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightDIO);
     public boolean isIntaking = false;
 
-    public EndeffectorSubsystem() {
+    public EndEffectorSubsystem() {
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = Constants.EndEffector.kP;
         config.Slot0.kI = Constants.EndEffector.kI;
@@ -53,10 +53,10 @@ public class EndeffectorSubsystem extends SubsystemBase {
             isIntaking = false;
         }
 
-        Logger.recordOutput("/Subsystems/EndEffector/LeftBeam", leftBeam.get());
-        Logger.recordOutput("/Subsystems/EndEffector/RightBeam", rightBeam.get());
-        Logger.recordOutput("/Subsystems/EndEffector/Intaken", getIntaken());
-        Logger.recordOutput("/Subsystems/EndEffector/LeftBeam", IntakeMotor.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Subsystems/EndEffector/LeftBeam", (boolean) leftBeam.get());
+        Logger.recordOutput("Subsystems/EndEffector/RightBeam", (boolean) rightBeam.get());
+        Logger.recordOutput("Subsystems/EndEffector/Intaken", getIntaken());
+        Logger.recordOutput("Subsystems/EndEffector/LeftBeam", IntakeMotor.getMotorVoltage().getValueAsDouble());
     }
 
 }

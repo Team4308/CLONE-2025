@@ -5,13 +5,13 @@
 package frc.robot;
 
 import java.io.File;
-
+import java.lang.management.OperatingSystemMXBean;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.XBoxWrapper;
-
+import ca.team4308.absolutelib.math.DoubleUtils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
-
+import frc.robot.subsystems.EndEffectorSubsystem;
+import frc.robot.subsystems.PivotSubsystem;
 import frc.robot.subsystems.Simulation;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -36,12 +38,14 @@ public class RobotContainer {
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
-       
+
         // Commands
 
         private final SendableChooser<Command> autoChooser;
 
         private final Simulation m_simulation;
+        private final PivotSubsystem m_pivotSubsystem;
+        private final EndEffectorSubsystem m_endEffectorSubsystem;
 
         private final Trigger drivebaseAlignedTrigger;
 
@@ -86,8 +90,9 @@ public class RobotContainer {
         SwerveInputStream driveToClosestRightReef = driveDirectAngle.copy();
 
         public RobotContainer() {
- 
                 m_simulation = new Simulation();
+                m_pivotSubsystem = new PivotSubsystem();
+                m_endEffectorSubsystem = new EndEffectorSubsystem();
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
 
@@ -99,6 +104,8 @@ public class RobotContainer {
                 DriverStation.silenceJoystickConnectionWarning(true);
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);
+
+                m_simulation.setupSubsystems(m_pivotSubsystem, m_endEffectorSubsystem);
         }
 
         private void configureDriverBindings() {
@@ -137,38 +144,25 @@ public class RobotContainer {
         }
 
         private void configureOperatorBindings() {
+                operator.X.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(60)));
+                operator.Y.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(5)));
+                operator.A.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(120)));
         }
 
         private void configureOtherTriggers() {
- 
+
                 drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> System.out.println("Drivebase Aligned")));
                 drivebaseAlignedTrigger.onFalse(new InstantCommand(() -> {
-   
 
                 }));
         }
 
         public void configureTeleopBindings() {
-          
-                drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 1)));
-                drivebaseAlignedTrigger
-                                .onFalse(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
 
-                // drivebaseAlignedTrigger.onTrue(new InstantCommand(() ->
-                // driver.setRumble(RumbleType.kBothRumble, 1)));
-                // drivebaseAlignedTrigger.onFalse(new InstantCommand(() ->
-                // driver.setRumble(RumbleType.kBothRumble, 0)));
-
-                operator.X.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
-                operator.A.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
-                operator.Y.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
-                operator.RB.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
-                operator.LB.onTrue(new InstantCommand(() -> operator.setRumble(RumbleType.kBothRumble, 0)));
         }
 
         public void configureNamedCommands() {
         }
-
 
         /**
          * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -180,7 +174,7 @@ public class RobotContainer {
         }
 
         public void robotPeriodic() {
-              
+
         }
 
         public void teleopInit() {
@@ -191,6 +185,7 @@ public class RobotContainer {
         }
 
         public void simulationPerodic() {
+                // m_pivotSubsystem.setPivotTarget(joystickPivot());
         }
 
         public void disabledInit() {
@@ -198,22 +193,12 @@ public class RobotContainer {
                 operator.setRumble(RumbleType.kBothRumble, 0);
         }
 
-        private double joystickAlgaeArm() {
-                return -deadZone(operator.getLeftY()) * 7;
-        }
+        private double pivotAngle = 0;
 
-        public double joystickElevatorControl() {
-                return -deadZone(operator.getRightY()) / 10;
-        }
-
-        private double triggerRollerControl() {
-                double isPos = deadZone(operator.getRightTrigger()) * 50;
-                double isNeg = deadZone(operator.getLeftTrigger()) * 50;
-                if (isPos > 0) {
-                        return isPos;
-                } else {
-                        return -isNeg;
-                }
+        private double joystickPivot() {
+                pivotAngle -= deadZone(operator.getLeftY()) * 10;
+                pivotAngle = DoubleUtils.clamp(pivotAngle, 5, 130);
+                return pivotAngle;
         }
 
         public void runSystemsCheck() {
