@@ -100,7 +100,7 @@ public class PivotSubsystem extends SubsystemBase {
          */
 
         if (Robot.isSimulation()) {
-            // m_pivotEncoder.setPosition(simEncoderVal, 0.001);
+            m_pivotEncoder.setPosition(simEncoderVal, 0.001);
         }
 
         double rawAngle = m_pivotEncoder.getPosition().getValueAsDouble();

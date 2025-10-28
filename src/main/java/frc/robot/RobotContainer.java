@@ -128,8 +128,8 @@ public class RobotContainer {
 
                 driver.A.onTrue(TogglePivotCommand);
 
-                driver.Y.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
-                driver.Y.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                driver.Start.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
+                driver.Start.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
 
                 driver.Y.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
                                 () -> deadZone(driver.getRightTrigger())),

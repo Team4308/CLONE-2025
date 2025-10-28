@@ -25,6 +25,9 @@ public class Ports {
 
     public static class Climb {
         public static final int Motor = 5;
+        public static final int topBeamBreak = 0;
+        public static final int botBeamBreak = 0;
+        public static final double speed = 0.5;
     }
 
 }
