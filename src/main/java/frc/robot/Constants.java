@@ -56,6 +56,10 @@ public final class Constants {
     }
 
     public static class Pivot {
+        public static final double scoreAngle = 60;
+        public static final double intakeAngle = 5;
+        public static final double restAngle = 130;
+
         // PID Values
         public static final double Pivot_kP = 0.05;
         public static final double Pivot_kI = 0.0;

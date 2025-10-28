@@ -6,9 +6,11 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Ports;
+import frc.robot.Robot;
 
 public class EndEffectorSubsystem extends SubsystemBase {
 
@@ -27,7 +29,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
         CenteringMotor.getConfigurator().apply(config);
     }
 
-    boolean getIntaken() {
+    public boolean simIntaking = false;
+
+    public boolean getIntaken() {
+        if (Robot.isSimulation()) {
+            return simIntaking;
+        }
         return leftBeam.get() || rightBeam.get();
     }
 

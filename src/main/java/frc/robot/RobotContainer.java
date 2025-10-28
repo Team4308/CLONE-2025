@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
+import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
 import frc.robot.subsystems.Simulation;
@@ -33,13 +34,14 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
         // Controllers
         private final XBoxWrapper driver = new XBoxWrapper(Ports.Joysticks.DRIVER);
-        private final XBoxWrapper operator = new XBoxWrapper(Ports.Joysticks.OPERATOR);
 
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
 
         // Commands
+
+        private final TogglePivot TogglePivotCommand;
 
         private final SendableChooser<Command> autoChooser;
 
@@ -94,11 +96,12 @@ public class RobotContainer {
                 m_pivotSubsystem = new PivotSubsystem();
                 m_endEffectorSubsystem = new EndEffectorSubsystem();
 
+                TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
+
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
 
                 configureNamedCommands();
                 configureDriverBindings();
-                configureOperatorBindings();
                 configureOtherTriggers();
 
                 DriverStation.silenceJoystickConnectionWarning(true);
@@ -109,30 +112,31 @@ public class RobotContainer {
         }
 
         private void configureDriverBindings() {
-                // Command driveFieldOrientedDirectAngle =
-                // drivebase.driveFieldOriented(driveDirectAngle);
+                /*
+                 * 
+                 * left joystick: strafe
+                 * right joystick: rotation
+                 * A (bottom): intake/score
+                 * X, B: reef align
+                 * Y: align to coral
+                 */
+
                 Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-                // Command driveRobotOrientedAngularVelocity =
-                // drivebase.driveFieldOriented(driveRobotOriented);
-                // Command driveSetpointGen =
-                // drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
-                // Command driveFieldOrientedDirectAngleKeyboard =
-                // drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+
                 Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
-                // Command driveSetpointGenKeyboard = drivebase
-                // .driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
-                // driver.A.whileTrue(drivebase.updateClosestAlgaePose()
-                // .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToAlgaeRemove)));
-                driver.A.whileTrue(drivebase.updateClosestReefPoses()
+                driver.A.onTrue(TogglePivotCommand);
+
+                driver.Y.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
+                driver.Y.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                // driver.Y.whileTrue(); // CORAL ALIGN
+
+                driver.X.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
                 driver.B.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToRightReef)));
-                driver.X.whileTrue(drivebase.updateClosestStationPose()
-                                .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToFarCoralStation)));
-                driver.Y.whileTrue(drivebase.updateClosestStationPose()
-                                .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToNearCoralStation)));
+
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
                 driver.RB.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
@@ -141,12 +145,6 @@ public class RobotContainer {
                 } else {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
                 }
-        }
-
-        private void configureOperatorBindings() {
-                operator.X.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(60)));
-                operator.Y.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(5)));
-                operator.A.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(120)));
         }
 
         private void configureOtherTriggers() {
@@ -190,15 +188,6 @@ public class RobotContainer {
 
         public void disabledInit() {
                 driver.setRumble(RumbleType.kBothRumble, 0);
-                operator.setRumble(RumbleType.kBothRumble, 0);
-        }
-
-        private double pivotAngle = 0;
-
-        private double joystickPivot() {
-                pivotAngle -= deadZone(operator.getLeftY()) * 10;
-                pivotAngle = DoubleUtils.clamp(pivotAngle, 5, 130);
-                return pivotAngle;
         }
 
         public void runSystemsCheck() {

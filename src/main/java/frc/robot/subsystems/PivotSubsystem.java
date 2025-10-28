@@ -108,6 +108,10 @@ public class PivotSubsystem extends SubsystemBase {
         m_pivotMotor.setVoltage(volts);
     }
 
+    public boolean atPosition() {
+        return atPosition;
+    }
+
     @Override
     public void periodic() {
         double currentRotations = getPivotAngle() / 90;
