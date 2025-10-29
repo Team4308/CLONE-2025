@@ -8,7 +8,7 @@
             "name": "LeftCamera",
             "fov": 70,
             "resolution": [1280, 800],
-            "position": [0.286385, 0.15875, 0.23495],
+            "position": [0.27305, 0.18415, 0.2413],
             "rotations": [
               {
                 "axis": "x",
@@ -16,11 +16,11 @@
               },
               {
                 "axis": "y",
-                "degrees": -10
+                "degrees": -15
               },
               {
                 "axis": "z",
-                "degrees": -50
+                "degrees": -45
               }
             ]
           },
@@ -28,7 +28,7 @@
             "name": "RightCamera",
             "fov": 70,
             "resolution": [1280, 800],
-            "position": [0.286385, -0.15875, 0.23495],
+            "position": [0.27305, -0.18415, 0.2413],
             "rotations": [
               {
                 "axis": "x",
@@ -36,11 +36,11 @@
               },
               {
                 "axis": "y",
-                "degrees": -10
+                "degrees": -15
               },
               {
                 "axis": "z",
-                "degrees": 50
+                "degrees": 45
               }
             ]
           }
