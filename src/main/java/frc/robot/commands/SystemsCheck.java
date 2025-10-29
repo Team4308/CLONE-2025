@@ -35,7 +35,9 @@ public class SystemsCheck extends SequentialCommandGroup {
                                                 "Testing Swerve Drive Rotation...")),
                                 new ParallelDeadlineGroup(new WaitCommand(1),
                                                 swerveSubsystem.driveCommand(() -> 0, () -> 0, () -> 5)),
+
                                 new WaitCommand(0.5),
+                                new InstantCommand(() -> swerveSubsystem.lock()),
 
                                 // Pivot and EndEffector
                                 new InstantCommand(() -> Logger.recordOutput("SystemsCheck/Status",
@@ -56,7 +58,6 @@ public class SystemsCheck extends SequentialCommandGroup {
 
                                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
                                 new WaitUntilCommand(m_PivotSubsystem::atPosition),
-
                                 new InstantCommand(
                                                 () -> Logger.recordOutput("SystemsCheck/Status", "Testing Release...")),
                                 new InstantCommand(m_EndEffectorSubsystem::Score),
