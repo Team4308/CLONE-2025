@@ -148,9 +148,10 @@ public class RobotContainer {
                 }
                 driver.M1.onTrue(ResetCommand);
 
-                driver.RightTriggerTrigger.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
-                                () -> deadZone(driver.getRightTrigger())),
-                                drivebase));
+                driver.RightTriggerTrigger.and(() -> m_pivotSubsystem.atPosition())
+                                .whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
+                                                () -> deadZone(driver.getRightTrigger())),
+                                                drivebase));
                 driver.RightTriggerTrigger.onTrue(OnlyIntakeCommand);
 
                 driver.M3.whileTrue(drivebase.updateClosestReefPoses()

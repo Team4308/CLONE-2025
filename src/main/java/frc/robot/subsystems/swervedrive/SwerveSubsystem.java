@@ -445,6 +445,12 @@ public class SwerveSubsystem extends SubsystemBase {
               0,
               new Rotation2d(
                   Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble()))));
+    } else {
+      swerveDrive.drive(
+          getTargetSpeeds(
+              -throttle.get(),
+              0,
+              new Rotation2d()));
     }
   }
 
