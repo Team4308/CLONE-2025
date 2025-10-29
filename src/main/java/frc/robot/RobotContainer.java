@@ -10,7 +10,7 @@ import java.lang.management.OperatingSystemMXBean;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import ca.team4308.absolutelib.control.XBoxWrapper;
+import ca.team4308.absolutelib.control.RazerWrapper;
 import ca.team4308.absolutelib.math.DoubleUtils;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -33,7 +33,7 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
         // Controllers
-        private final XBoxWrapper driver = new XBoxWrapper(Ports.Joysticks.DRIVER);
+        private final RazerWrapper driver = new RazerWrapper(Ports.Joysticks.DRIVER);
 
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
@@ -50,6 +50,7 @@ public class RobotContainer {
         private final EndEffectorSubsystem m_endEffectorSubsystem;
 
         private final Trigger drivebaseAlignedTrigger;
+        private final Trigger isIntakenTrigger;
 
         // Converts driver input into a field-relative ChassisSpeeds that is controlled
         // by angular velocity.
@@ -75,7 +76,7 @@ public class RobotContainer {
         SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
                         () -> -driver.getLeftY(),
                         () -> -driver.getLeftX())
-                        .withControllerRotationAxis(() -> driver.getRightX())
+                        .withControllerRotationAxis(() -> -driver.getRightX())
                         .deadband(Driver.DEADBAND)
                         .scaleTranslation(0.8)
                         .allianceRelativeControl(true);
@@ -99,6 +100,7 @@ public class RobotContainer {
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
+                isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
 
                 configureNamedCommands();
                 configureDriverBindings();
@@ -126,18 +128,18 @@ public class RobotContainer {
                 Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
-                driver.A.onTrue(TogglePivotCommand);
+                driver.M2.onTrue(TogglePivotCommand);
 
-                driver.Start.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
-                driver.Start.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
+                driver.M1.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
 
-                driver.Y.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
+                driver.RightTriggerTrigger.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
                                 () -> deadZone(driver.getRightTrigger())),
                                 drivebase));
 
-                driver.X.whileTrue(drivebase.updateClosestReefPoses()
+                driver.M3.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
-                driver.B.whileTrue(drivebase.updateClosestReefPoses()
+                driver.M4.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToRightReef)));
 
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -151,11 +153,7 @@ public class RobotContainer {
         }
 
         private void configureOtherTriggers() {
-
-                drivebaseAlignedTrigger.onTrue(new InstantCommand(() -> System.out.println("Drivebase Aligned")));
-                drivebaseAlignedTrigger.onFalse(new InstantCommand(() -> {
-
-                }));
+                drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
         }
 
         public void configureTeleopBindings() {
