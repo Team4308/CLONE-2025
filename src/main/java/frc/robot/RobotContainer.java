@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
+import frc.robot.commands.OnlyIntake;
 import frc.robot.commands.Reset;
 import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -46,6 +47,7 @@ public class RobotContainer {
 
         private final TogglePivot TogglePivotCommand;
         private final Reset ResetCommand;
+        private final OnlyIntake OnlyIntakeCommand;
 
         private final SendableChooser<Command> autoChooser;
 
@@ -106,6 +108,7 @@ public class RobotContainer {
 
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
                 ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem);
+                OnlyIntakeCommand = new OnlyIntake(m_endEffectorSubsystem, m_pivotSubsystem);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
@@ -148,6 +151,7 @@ public class RobotContainer {
                 driver.RightTriggerTrigger.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
                                 () -> deadZone(driver.getRightTrigger())),
                                 drivebase));
+                driver.RightTriggerTrigger.onTrue(OnlyIntakeCommand);
 
                 driver.M3.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
