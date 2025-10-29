@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
+import frc.robot.commands.Reset;
 import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
@@ -44,6 +45,7 @@ public class RobotContainer {
         // Commands
 
         private final TogglePivot TogglePivotCommand;
+        private final Reset ResetCommand;
 
         private final SendableChooser<Command> autoChooser;
 
@@ -103,6 +105,7 @@ public class RobotContainer {
                 m_ClimbSubsystem = new ClimbSubsystem();
 
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
+                ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
@@ -136,8 +139,11 @@ public class RobotContainer {
 
                 driver.M2.onTrue(TogglePivotCommand);
 
-                driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
-                driver.M1.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                if (Robot.isSimulation()) {
+                        driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
+                        driver.M1.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                }
+                driver.M1.onTrue(ResetCommand);
 
                 driver.RightTriggerTrigger.whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
                                 () -> deadZone(driver.getRightTrigger())),
