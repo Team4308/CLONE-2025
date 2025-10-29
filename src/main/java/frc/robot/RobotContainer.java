@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
 import frc.robot.commands.OnlyIntake;
 import frc.robot.commands.Reset;
+import frc.robot.commands.SystemsCheck;
 import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
@@ -212,7 +213,8 @@ public class RobotContainer {
         }
 
         public void runSystemsCheck() {
-
+                
+                new SystemsCheck(m_endEffectorSubsystem, m_pivotSubsystem, drivebase, m_ClimbSubsystem).schedule();
         }
 
         public void setMotorBrake(boolean brake) {

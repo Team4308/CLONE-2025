@@ -67,6 +67,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
         CenteringMotor.set(0);
     }
 
+    public void setMotorSpeed(double speed) {
+        IntakeMotor.set(speed);
+    }
+
     @Override
     public void periodic() {
         if (getIntaken()) {
