@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
 import frc.robot.commands.TogglePivot;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
 import frc.robot.subsystems.Simulation;
@@ -48,9 +50,11 @@ public class RobotContainer {
         private final Simulation m_simulation;
         private final PivotSubsystem m_pivotSubsystem;
         private final EndEffectorSubsystem m_endEffectorSubsystem;
+        private final ClimbSubsystem m_ClimbSubsystem;
 
         private final Trigger drivebaseAlignedTrigger;
         private final Trigger isIntakenTrigger;
+        private final Trigger last15SecondsTrigger;
 
         // Converts driver input into a field-relative ChassisSpeeds that is controlled
         // by angular velocity.
@@ -96,11 +100,13 @@ public class RobotContainer {
                 m_simulation = new Simulation();
                 m_pivotSubsystem = new PivotSubsystem();
                 m_endEffectorSubsystem = new EndEffectorSubsystem();
+                m_ClimbSubsystem = new ClimbSubsystem();
 
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
+                last15SecondsTrigger = new Trigger(() -> Timer.getMatchTime() == 15);
 
                 configureNamedCommands();
                 configureDriverBindings();
@@ -145,6 +151,9 @@ public class RobotContainer {
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
                 driver.RB.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
+                driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
+
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);
                 } else {
@@ -154,6 +163,7 @@ public class RobotContainer {
 
         private void configureOtherTriggers() {
                 drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
+                last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
         }
 
         public void configureTeleopBindings() {
