@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
 import frc.robot.commands.OnlyIntake;
 import frc.robot.commands.Reset;
+import frc.robot.commands.SuperImportentCommand;
 import frc.robot.commands.SystemsCheck;
 import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -39,7 +40,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
         // Controllers
         private final RazerWrapper driver = new RazerWrapper(Ports.Joysticks.DRIVER);
-
+        
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -49,6 +50,7 @@ public class RobotContainer {
         private final TogglePivot TogglePivotCommand;
         private final Reset ResetCommand;
         private final OnlyIntake OnlyIntakeCommand;
+        private final SuperImportentCommand SuperImportentCommand;
 
         private final SendableChooser<Command> autoChooser;
 
@@ -110,6 +112,7 @@ public class RobotContainer {
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
                 ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem);
                 OnlyIntakeCommand = new OnlyIntake(m_endEffectorSubsystem, m_pivotSubsystem);
+                SuperImportentCommand = new SuperImportentCommand(m_pivotSubsystem, m_endEffectorSubsystem);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
@@ -165,6 +168,8 @@ public class RobotContainer {
 
                 driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
                 driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
+                
+                driver.LeftStickButton.onTrue(SuperImportentCommand);
 
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);

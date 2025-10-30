@@ -15,8 +15,8 @@ import frc.robot.Robot;
 
 public class EndEffectorSubsystem extends SubsystemBase {
 
-    private TalonFX IntakeMotor = new TalonFX(Ports.EndEffector.IntakeMotor);
-    private TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
+    public TalonFX IntakeMotor = new TalonFX(Ports.EndEffector.IntakeMotor);
+    public TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
     private DigitalInput leftBeam = new DigitalInput(Ports.EndEffector.leftDIO);
     private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightDIO);
     public boolean isIntaking = false;
