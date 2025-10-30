@@ -48,7 +48,7 @@ public class SuperImportentCommand extends Command {
     public void playSong(String SongPath) {
         if (SongPath != null && !SongPath.isBlank()) currentSong = SongPath;
         orchestra.loadMusic(currentSong);
-        orchestra.play();
+        //orchestra.play();
         SmartDashboard.putString("Orchestra/CurrentSong", currentSong);
         SmartDashboard.putBoolean("Orchestra/IsPlaying", true);
     }

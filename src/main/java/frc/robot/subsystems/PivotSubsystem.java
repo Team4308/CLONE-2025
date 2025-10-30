@@ -39,7 +39,7 @@ public class PivotSubsystem extends SubsystemBase {
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
-
+        m_pivotMotor.setInverted(true);
         // set slot 0 gains
         var slot0Configs = talonFXConfigs.Slot0;
         slot0Configs.kS = 0.0; // output to overcome static friction (output)
