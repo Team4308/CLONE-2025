@@ -19,7 +19,7 @@ public class Ports {
     public static class EndEffector {
         public static final int IntakeMotor = 13;
         public static final int CenteringMotor = 14;
-        public static final int leftDIO = 2;
+        public static final int leftDIO = 9;
         public static final int rightDIO = 3;
     }
 

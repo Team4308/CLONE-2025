@@ -60,9 +60,9 @@ public final class Constants {
         public static final boolean BRAKE_MODE = true;
 
 
-        public static final double scoreAngle = 60;
-        public static final double intakeAngle = 5;
-        public static final double restAngle = 130;
+        public static final double scoreAngle = 75;
+        public static final double intakeAngle = -10;
+        public static final double restAngle = 120;
 
         // PID Values
         public static final double Pivot_kP = 0.05;
@@ -103,7 +103,7 @@ public final class Constants {
 
     public static class EndEffector {
         // Motor Speeds (0-1)
-        public static final double IntakeSpeed = 0.5;
+        public static final double IntakeSpeed = 0.25;
         public static final double ScoreSpeed = -0.25;
         public static final double CenteringSpeed = 0.3;
 
