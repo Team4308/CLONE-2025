@@ -318,7 +318,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command updateClosestAlgaePose() {
     return this.runOnce(() -> {
-      nearestPoseToAlgaeRemove = getClosestAlgaeRemovePose();
+      Pose2d leftpose = getClosestLeftReefPose();
+      Pose2d rightpose = getClosestRightReefPose();
+
+      nearestPoseToAlgaeRemove = new Pose2d(leftpose.getTranslation().interpolate(
+          rightpose.getTranslation(), 0.5),
+          leftpose.getRotation().interpolate(rightpose.getRotation(), 0.5));
     });
   }
 

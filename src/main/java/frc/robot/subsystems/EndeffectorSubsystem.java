@@ -56,10 +56,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public void CenterCoral(int dir) {
         CenteringMotor.set(Constants.EndEffector.CenteringSpeed * dir);
+        IntakeMotor.set(Constants.EndEffector.IntakeSpeed / 5);
     }
 
     public void StopCentering() {
         CenteringMotor.set(0);
+        IntakeMotor.set(0);
     }
 
     public void StopMotors() {

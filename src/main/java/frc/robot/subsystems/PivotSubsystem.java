@@ -63,8 +63,6 @@ public class PivotSubsystem extends SubsystemBase {
         talonFXConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         talonFXConfigs.Feedback.FeedbackRemoteSensorID = m_pivotEncoder.getDeviceID();
         talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        // talonFXConfigs.Feedback.RotorToSensorRatio = 0.08081; // Rotor range must be
-        // 1:
         // talonFXConfigs.Feedback.SensorToMechanismRatio = 90; // Cancoder range must
         // be 0-1 for mechanism range
         // 10-140 respectively, however the mechanism is
