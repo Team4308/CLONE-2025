@@ -69,7 +69,8 @@ public class Simulation extends SubsystemBase {
                             Units.degreesToRadians(270)));
             m_pivotMech2d.setAngle(Units.radiansToDegrees(m_pivotSim.getAngleRads()));
 
-            m_PivotSubsystem.simEncoderVal = (Units.radiansToDegrees(m_pivotSim.getAngleRads())) / 90;
+            // m_PivotSubsystem.simEncoderVal =
+            // (Units.radiansToDegrees(m_pivotSim.getAngleRads())) / 90;
         }
 
         Logger.recordOutput("Simulation/pivotPose", pivotPose);

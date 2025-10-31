@@ -10,15 +10,15 @@ public class Ports {
     }
 
     public static class Pivot {
-        public static final int PivotMotor = 1;
-        public static final int PivotEncoder = 2;
+        public static final int PivotMotor = 11;
+        public static final int PivotEncoder = 12;
         public static final int TopLimitSwitch = 0;
         public static final int BotLimitSwitch = 10;
     }
 
     public static class EndEffector {
-        public static final int IntakeMotor = 3;
-        public static final int CenteringMotor = 4;
+        public static final int IntakeMotor = 13;
+        public static final int CenteringMotor = 14;
         public static final int leftDIO = 2;
         public static final int rightDIO = 3;
     }
