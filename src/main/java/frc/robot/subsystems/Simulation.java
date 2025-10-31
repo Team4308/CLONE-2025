@@ -58,24 +58,26 @@ public class Simulation extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isSimulation()) {
-            m_pivotSim.setInputVoltage(m_PivotSubsystem.getPivotVoltage());
-
-            m_pivotSim.update(0.020);
-
-            pivotPose = new Pose3d(
-                    new Translation3d(0.289, 0.295, 0.19),
-                    new Rotation3d(m_pivotSim.getAngleRads() + Units.degreesToRadians(-50), 0,
-                            Units.degreesToRadians(270)));
-            m_pivotMech2d.setAngle(Units.radiansToDegrees(m_pivotSim.getAngleRads()));
-
-            // m_PivotSubsystem.simEncoderVal =
-            // (Units.radiansToDegrees(m_pivotSim.getAngleRads())) / 90;
-        }
-
-        Logger.recordOutput("Simulation/pivotPose", pivotPose);
-        Logger.recordOutput("Simulation/Mechanism", mech);
-        Logger.recordOutput("Simulation/Zeroed Pose", zeroPose);
+        /*
+         * if (Robot.isSimulation()) {
+         * m_pivotSim.setInputVoltage(m_PivotSubsystem.getPivotVoltage());
+         * 
+         * m_pivotSim.update(0.020);
+         * 
+         * pivotPose = new Pose3d(
+         * new Translation3d(0.289, 0.295, 0.19),
+         * new Rotation3d(m_pivotSim.getAngleRads() + Units.degreesToRadians(-50), 0,
+         * Units.degreesToRadians(270)));
+         * m_pivotMech2d.setAngle(Units.radiansToDegrees(m_pivotSim.getAngleRads()));
+         * 
+         * // m_PivotSubsystem.simEncoderVal =
+         * // (Units.radiansToDegrees(m_pivotSim.getAngleRads())) / 90;
+         * }
+         * 
+         * Logger.recordOutput("Simulation/pivotPose", pivotPose);
+         * Logger.recordOutput("Simulation/Mechanism", mech);
+         * Logger.recordOutput("Simulation/Zeroed Pose", zeroPose);
+         */
 
     }
 }

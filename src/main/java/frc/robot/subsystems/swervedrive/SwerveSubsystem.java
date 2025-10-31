@@ -163,10 +163,9 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest) {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-    }
+    swerveDrive.updateOdometry();
+    vision.updatePoseEstimation(swerveDrive);
+
     // checkTunableValues();
 
     // publisher.set(getPose());
@@ -174,16 +173,12 @@ public class SwerveSubsystem extends SubsystemBase {
     driverStationField.setRobotPose(getPose());
     SmartDashboard.putData("driverStationField", driverStationField);
 
-    vision.updateVisionField();
+    // vision.updateVisionField();
 
     // SmartDashboard.putBoolean("Aligned?", isAligned());
     Logger.recordOutput("Swerve/Is Aligned?", isAligned());
     Logger.recordOutput("Swerve/Pose", getPose());
     Logger.recordOutput("Swerve/Velocity", getRobotVelocity());
-  }
-
-  @Override
-  public void simulationPeriodic() {
   }
 
   public void checkTunableValues() {
@@ -279,58 +274,10 @@ public class SwerveSubsystem extends SubsystemBase {
     return nearestPose;
   }
 
-  public Pose2d getClosestAlgaeRemovePose() {
-    Pose2d nearestPose = new Pose2d();
-    if (isRedAlliance()) {
-      nearestPose = getPose().nearest(FieldLayout.ALGAE.RED_ALGAE_POSES);
-    } else {
-      nearestPose = getPose().nearest(FieldLayout.ALGAE.BLUE_ALGAE_POSES);
-    }
-    return nearestPose;
-  }
-
-  public Pose2d getClosestFarCoralStationPose() {
-    Pose2d nearestPose = new Pose2d();
-    if (isRedAlliance()) {
-      nearestPose = getPose().nearest(FieldLayout.CORAL_STATION.RED_FAR_STATION_POSES);
-    } else {
-      nearestPose = getPose().nearest(FieldLayout.CORAL_STATION.BLUE_FAR_STATION_POSES);
-    }
-    return nearestPose;
-  }
-
-  public Pose2d getClosestNearCoralStationPose() {
-    Pose2d nearestPose = new Pose2d();
-    if (isRedAlliance()) {
-      nearestPose = getPose().nearest(FieldLayout.CORAL_STATION.RED_NEAR_STATION_POSES);
-    } else {
-      nearestPose = getPose().nearest(FieldLayout.CORAL_STATION.BLUE_NEAR_STATION_POSES);
-    }
-    return nearestPose;
-  }
-
   public Command updateClosestReefPoses() {
     return this.runOnce(() -> {
       nearestPoseToLeftReef = getClosestLeftReefPose();
       nearestPoseToRightReef = getClosestRightReefPose();
-    });
-  }
-
-  public Command updateClosestAlgaePose() {
-    return this.runOnce(() -> {
-      Pose2d leftpose = getClosestLeftReefPose();
-      Pose2d rightpose = getClosestRightReefPose();
-
-      nearestPoseToAlgaeRemove = new Pose2d(leftpose.getTranslation().interpolate(
-          rightpose.getTranslation(), 0.5),
-          leftpose.getRotation().interpolate(rightpose.getRotation(), 0.5));
-    });
-  }
-
-  public Command updateClosestStationPose() {
-    return this.runOnce(() -> {
-      nearestPoseToFarCoralStation = getClosestFarCoralStationPose();
-      nearestPoseToNearCoralStation = getClosestNearCoralStationPose();
     });
   }
 
@@ -356,11 +303,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public boolean isAligned() {
-    if (isTranslationAligned() && isHeadingAligned()) {
-      return true;
-    } else {
-      return false;
-    }
+    return isTranslationAligned() && isHeadingAligned();
   }
 
   public Command getAutonomousCommand(String pathName) {

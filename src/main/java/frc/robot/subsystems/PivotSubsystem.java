@@ -60,7 +60,6 @@ public class PivotSubsystem extends SubsystemBase {
     }
 
     public double getPivotAngle() {
-        System.out.println(m_pivotEncoder.getPosition().getValueAsDouble() * 360 * 12 / 22);
         return m_pivotEncoder.getPosition().getValueAsDouble() * 360 * 12 / 22 - encoderOffset;
     }
 
