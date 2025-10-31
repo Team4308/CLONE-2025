@@ -169,8 +169,6 @@ public class RobotContainer {
                 driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
                 driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
                 
-                driver.LeftStickButton.onTrue(SuperImportentCommand);
-
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);
                 } else {

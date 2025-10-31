@@ -56,19 +56,30 @@ public final class Constants {
     }
 
     public static class Pivot {
+        public static final boolean INVERTED = false;
+        public static final boolean BRAKE_MODE = true;
+
+
         public static final double scoreAngle = 60;
         public static final double intakeAngle = 5;
         public static final double restAngle = 130;
 
         // PID Values
         public static final double Pivot_kP = 0.05;
-        public static final double Pivot_kI = 0.0;
-        public static final double Pivot_kD = 0.0;
+        public static final double PkI = 0.0;
+        public static final double kD = 0.0;
 
         // Mech properties
         public static final double Gear_Ratio = 1.0 / 1.0;
         public static final double Max_Angle = 90.0;
         public static final double Pivot_EncoderTicksPerRevolution = 4096.0;
+        public static final double POSITION_CONVERSION = 360.0 / Pivot_EncoderTicksPerRevolution; // degrees per tick
+        public static final double VELOCITY_CONVERSION = POSITION_CONVERSION / 60.0; // degrees per second per RPM
+        // Smart Motion Constraints
+        public static final double SM_MAX_VEL = 180.0; // deg/s
+        public static final double SM_MAX_ACCEL = 360.0; // deg/s^2
+        public static final double SM_ALLOWED_ERR = 1.0; // deg
+
 
         // FF Gains
         public static final double Pivot_kS = 0.2;
@@ -85,6 +96,9 @@ public final class Constants {
         // Controller tolerances
         public static final double PivotPositionToleranceDeg = 1.0;
         public static final double PivotVelocityToleranceDegPerSec = 5.0;
+
+
+
     }
 
     public static class EndEffector {

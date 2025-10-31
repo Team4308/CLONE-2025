@@ -43,12 +43,12 @@ public class PivotSubsystem extends SubsystemBase {
         // set slot 0 gains
         var slot0Configs = talonFXConfigs.Slot0;
         slot0Configs.kS = 0.0; // output to overcome static friction (output)
-        slot0Configs.kV = 6.7; // output per unit of target velocity (output/rps)
-        slot0Configs.kP = 60; // output per unit of error in position (output/rotation)
-        slot0Configs.kI = 0; // output per unit of integrated error in position (output/(rotation*s))
+        slot0Configs.kV = -3.0; // output per unit of target velocity (output/rps)
+        slot0Configs.kP = 0.0; // output per unit of error in position (output/rotation)
+        slot0Configs.kI = 0.0; // output per unit of integrated error in position (output/(rotation*s))
         slot0Configs.kD = 0.0; // A velocity error of 1 rps results in 0.1 V output
-        slot0Configs.kG = 2.37; // output to overcome gravity (output)
-        slot0Configs.kA = 0.07; // output per unit of target acceleration (output/(rps/s))
+        slot0Configs.kG = -0.3; // output to overcome gravity (output)
+        slot0Configs.kA = 0.0; // output per unit of target acceleration (output/(rps/s))
         slot0Configs.GravityType = GravityTypeValue.Arm_Cosine; // Arm feedforward for talonFX, 0 is horizontal and 1 is
                                                                 // up (of the sensor)
 
@@ -73,8 +73,8 @@ public class PivotSubsystem extends SubsystemBase {
         m_pivotMotor.getConfigurator().apply(talonFXConfigs);
 
         CANcoderConfiguration canConfig = new CANcoderConfiguration();
-        canConfig.MagnetSensor.MagnetOffset = 0.0; // Set this on robot turn on? or a button to reset this
-        canConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        canConfig.MagnetSensor.MagnetOffset = -0.147; // Set this on robot turn on? or a button to reset this
+        canConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 
         m_pivotEncoder.getConfigurator().apply(canConfig);
 
