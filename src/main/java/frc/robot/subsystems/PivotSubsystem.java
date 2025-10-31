@@ -25,6 +25,8 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,28 +41,30 @@ public class PivotSubsystem extends SubsystemBase {
     private DigitalInput botBreak = new DigitalInput(Ports.Pivot.BotLimitSwitch);
 
     private boolean atPosition = false;
-    private double targetAngle = 0;
+    private double targetAngle = -10;
     private double encoderOffset = 0;
 
-    private ArmFeedforward feedforward = new ArmFeedforward(0, 0, 0, 0);
-    private PIDController pidController = new PIDController(0, 0, 0);
+    private ArmFeedforward feedforward = new ArmFeedforward(0, 0.25, 0.02, 0);
+    private ProfiledPIDController pidController = new ProfiledPIDController(0.01, 0.0, 0.0,
+            new TrapezoidProfile.Constraints(90, 180));
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
         talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        encoderOffset = -140;
+        encoderOffset = 107;
 
         m_pivotMotor.getConfigurator().apply(talonFXConfigs);
     }
 
     public void setPivotTarget(double angle) {
-        targetAngle = DoubleUtils.clamp(angle, 5, 130);
+        targetAngle = DoubleUtils.clamp(angle, -10, 120);
+        System.out.println(targetAngle);
     }
 
     public double getPivotAngle() {
-        return m_pivotEncoder.getPosition().getValueAsDouble() * 360 * 12 / 22 - encoderOffset;
+        return m_pivotEncoder.getPosition().getValueAsDouble() * 360 * 12 / 22 + encoderOffset;
     }
 
     public double getPivotVoltage() {
@@ -87,15 +91,16 @@ public class PivotSubsystem extends SubsystemBase {
 
         atPosition = Math.abs(currentAngle - targetAngle) < 3;
 
-        double feedforwardVolts = feedforward.calculate(Units.degreesToRadians(targetAngle), 0);
         double pidOutput = pidController.calculate(currentAngle, targetAngle);
+        double feedforwardVolts = feedforward.calculate(Units.degreesToRadians(targetAngle),
+                pidController.getSetpoint().velocity);
 
         double outputVolts = feedforwardVolts + pidOutput;
 
         driveVoltage(outputVolts);
 
         Logger.recordOutput("Subsystems/Pivot/AtTArget", atPosition);
-        Logger.recordOutput("Subsystems/Pivot/TargetPos", targetAngle);
+        Logger.recordOutput("Subsystems/Pivot/TargetPos", pidController.getSetpoint().position);
         Logger.recordOutput("Subsystems/Pivot/CurPos", currentAngle);
         Logger.recordOutput("Subsystems/Pivot/Voltage", m_pivotMotor.getMotorVoltage().getValueAsDouble());
     }

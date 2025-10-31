@@ -144,7 +144,11 @@ public class RobotContainer {
                 Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
-                driver.M2.onTrue(TogglePivotCommand);
+                // driver.M2.onTrue(TogglePivotCommand);
+                driver.A.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(-10)));
+                driver.B.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(45)));
+                driver.X.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(90)));
+                driver.Y.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(120)));
 
                 if (Robot.isSimulation()) {
                         driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
@@ -177,7 +181,7 @@ public class RobotContainer {
         }
 
         private void configureOtherTriggers() {
-                drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
+                // drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
                 last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
         }
 
