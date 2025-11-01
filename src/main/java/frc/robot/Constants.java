@@ -24,11 +24,11 @@ public final class Constants {
 
         public static final class Align {
             public static final class Heading {
-                public static final double TOLERANCE = 1; // in degrees
+                public static final double TOLERANCE = 5; // in degrees
             }
 
             public static final class Translation {
-                public static final double TOLERANCE = Units.inchesToMeters(1.0);
+                public static final double TOLERANCE = Units.inchesToMeters(3.0);
             }
         }
 

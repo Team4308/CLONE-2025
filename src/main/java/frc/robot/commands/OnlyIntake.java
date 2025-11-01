@@ -36,6 +36,7 @@ public class OnlyIntake extends Command {
                 new InstantCommand(() -> m_EndEffectorSubsystem.Intake()),
                 new WaitUntilCommand(() -> m_EndEffectorSubsystem.getIntaken()),
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
+                new InstantCommand(() -> m_EndEffectorSubsystem.StopMotors()),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
     }
 }

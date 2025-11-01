@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
 
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -62,7 +60,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.Swerve;
 import frc.robot.FieldLayout;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -166,9 +163,11 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    swerveDrive.updateOdometry();
-    vision.updatePoseEstimation(swerveDrive);
-    vision.updateObjectOffset();
+    if (visionDriveTest) {
+      swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive);
+      vision.updateObjectOffset();
+    }
 
     // checkTunableValues();
 
@@ -319,9 +318,23 @@ public class SwerveSubsystem extends SubsystemBase {
     return defer(() -> driveToPose(pose.get()));
   }
 
+  public Command driveToPose2(Pose2d pose) {
+    PathConstraints constraints = new PathConstraints(
+        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder.pathfindToPose(
+        pose,
+        constraints,
+        edu.wpi.first.units.Units.MetersPerSecond.of(0));
+  }
+
   public Command driveToPose(Pose2d pose) {
     // Change target pose
     targetPose = pose;
+    Logger.recordOutput("Swerve/targetRot", targetPose.getRotation().getDegrees());
+    Logger.recordOutput("Swerve/curRot", getPose().getRotation().getDegrees());
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
@@ -370,13 +383,28 @@ public class SwerveSubsystem extends SubsystemBase {
 
     driverStationField.getObject("Path").setPoses(points);
 
-    return AutoBuilder.followPath(path)
-        .andThen(run(() -> swerveDrive.drive(ALIGN_CONTROLLER.calculateRobotRelativeSpeeds(getPose(), goalState))));
+    return run(() -> swerveDrive.drive(calcisshortforcalculator(goalState)));
+    // return AutoBuilder.followPath(path)
+    // .andThen(run(() -> swerveDrive.drive(out)));
 
     // // PID only test
     // return run(() ->
     // swerveDrive.drive(ALIGN_CONTROLLER.calculateRobotRelativeSpeeds(getPose(),
     // goalState)));
+  }
+
+  private ChassisSpeeds calcisshortforcalculator(PathPlannerTrajectoryState goalState) {
+    ChassisSpeeds out = ALIGN_CONTROLLER.calculateRobotRelativeSpeeds(getPose(), goalState);
+    out.omegaRadiansPerSecond = -out.omegaRadiansPerSecond; // Invert rotation direction
+    return out;
+  }
+
+  public Command turn180() {
+    return run(() -> {
+      swerveDrive.drive(
+          getTargetSpeeds(0, 0, 0, 0.0));
+    }).until(() -> Math
+        .abs(getHeading().getDegrees() - (getHeading().getDegrees() + 180) % 360) < Swerve.Align.Heading.TOLERANCE);
   }
 
   public Command driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond) {
@@ -399,7 +427,7 @@ public class SwerveSubsystem extends SubsystemBase {
     OptionalDouble yawDiff = vision.getObjectOffset().get();
     swerveDrive.drive(
         getTargetSpeeds(
-            DoubleUtils.clamp(throttle.get(), 0, 0.7),
+            DoubleUtils.clamp(throttle.get(), 0, 0.8),
             0,
             new Rotation2d(
                 Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble() + 2))));

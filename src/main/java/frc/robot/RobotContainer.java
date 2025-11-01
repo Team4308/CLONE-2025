@@ -118,7 +118,7 @@ public class RobotContainer {
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
-                last15SecondsTrigger = new Trigger(() -> Timer.getMatchTime() == 15);
+                last15SecondsTrigger = new Trigger(() -> DriverStation.getMatchTime() <= 100);
                 coralSpottedTrigger = new Trigger(() -> drivebase.hasTarget());
 
                 configureNamedCommands();
@@ -157,6 +157,8 @@ public class RobotContainer {
                 // driver.Y.onTrue(new InstantCommand(() ->
                 // m_pivotSubsystem.setPivotTarget(120)));
 
+                driver.Y.onTrue(drivebase.turn180());
+
                 if (Robot.isSimulation()) {
                         driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
                         driver.M1.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
@@ -176,8 +178,8 @@ public class RobotContainer {
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
                 driver.RB.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-                // driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
-                // driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
+                driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
 
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);

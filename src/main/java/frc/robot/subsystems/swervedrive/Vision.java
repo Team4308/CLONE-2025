@@ -272,7 +272,7 @@ public class Vision {
      * Right Camera
      */
     FUNNEL_CAM("Funnelcam_OV9281",
-        new Rotation3d(0, Math.toRadians(20), 0),
+        new Rotation3d(0, Math.toRadians(25), 0),
         new Translation3d(-0.235, 0, 0.996411),
         VecBuilder.fill(1, 1, 4), VecBuilder.fill(0.5, 0.5, 2));
 

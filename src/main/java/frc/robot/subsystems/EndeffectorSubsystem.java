@@ -29,6 +29,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         slot0Configs.kD = 0; // no output for error derivative
         IntakeMotor.getConfigurator().apply(slot0Configs);
         CenteringMotor.getConfigurator().apply(slot0Configs);
+
     }
 
     public boolean simIntaking = false;
@@ -37,7 +38,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
         if (Robot.isSimulation()) {
             return simIntaking;
         }
-        return leftBeam.get() || rightBeam.get();
+        return rightBeam.get();
     }
 
     public void Intake() {
