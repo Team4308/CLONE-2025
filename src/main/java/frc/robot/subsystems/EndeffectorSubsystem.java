@@ -72,7 +72,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (leftBeam.get() ^ rightBeam.get()) {
-            CenterCoral(1);
+            // CenterCoral(1);
         } else {
             StopCentering();
         }

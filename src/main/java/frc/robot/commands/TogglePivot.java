@@ -37,7 +37,7 @@ public class TogglePivot extends Command {
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.intakeAngle)),
                 new InstantCommand(() -> m_EndEffectorSubsystem.Intake()),
                 new WaitUntilCommand(() -> m_EndEffectorSubsystem.getIntaken()),
-                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(Constants.EndEffector.IntakeSpeed / 5)),
+                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0.0)),
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
     }
@@ -47,7 +47,7 @@ public class TogglePivot extends Command {
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.scoreAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()),
                 new InstantCommand(() -> m_EndEffectorSubsystem.Score()),
-                new WaitCommand(1.0),
+                new WaitCommand(0.5),
                 new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0)),
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));

@@ -93,7 +93,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final SwerveDrive swerveDrive;
 
-  private final boolean visionDriveTest = true;
+  private final boolean visionDriveTest = true; // disabling causes a boot loop on the bot
   private Vision vision;
 
   private Pose2d targetPose = new Pose2d();
@@ -112,7 +112,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.NONE;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED,
           new Pose2d(new Translation2d(Meter.of(1),

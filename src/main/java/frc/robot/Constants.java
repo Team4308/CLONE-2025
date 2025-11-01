@@ -60,8 +60,8 @@ public final class Constants {
         public static final boolean BRAKE_MODE = true;
 
 
-        public static final double scoreAngle = 75;
-        public static final double intakeAngle = -10;
+        public static final double scoreAngle = 90;
+        public static final double intakeAngle = -11;
         public static final double restAngle = 120;
 
         // PID Values
