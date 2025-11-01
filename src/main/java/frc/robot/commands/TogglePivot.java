@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -24,7 +25,6 @@ public class TogglePivot extends Command {
     @Override
     public void initialize() {
         CommandScheduler.getInstance().cancelAll();
-
         if (!m_EndEffectorSubsystem.getIntaken()) {
             intake().schedule();
         } else {
@@ -37,6 +37,7 @@ public class TogglePivot extends Command {
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.intakeAngle)),
                 new InstantCommand(() -> m_EndEffectorSubsystem.Intake()),
                 new WaitUntilCommand(() -> m_EndEffectorSubsystem.getIntaken()),
+                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0.0)),
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
     }
@@ -46,12 +47,9 @@ public class TogglePivot extends Command {
                 new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.scoreAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()),
                 new InstantCommand(() -> m_EndEffectorSubsystem.Score()),
-                new WaitUntilCommand(() -> !m_EndEffectorSubsystem.getIntaken()),
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
-                new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()),
                 new WaitCommand(0.5),
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.intakeAngle)),
+                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0)),
+                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
                 new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
     }
-
 }

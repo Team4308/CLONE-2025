@@ -39,7 +39,7 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("4308Overtime", Integer.toString(DriverStation.getMatchNumber())); // Set a metadata value
 
     if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      //Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else {
       Logger.addDataReceiver(new NT4Publisher());

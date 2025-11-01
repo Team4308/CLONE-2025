@@ -19,7 +19,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
     public TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
     private DigitalInput leftBeam = new DigitalInput(Ports.EndEffector.leftDIO);
     private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightDIO);
-    public boolean isIntaking = false;
 
     public EndEffectorSubsystem() {
         var slot0Configs = new Slot0Configs();
@@ -44,24 +43,21 @@ public class EndEffectorSubsystem extends SubsystemBase {
     public void Intake() {
         if (!getIntaken()) {
             IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
-            isIntaking = true;
         }
     }
 
     public void Score() {
         if (getIntaken()) {
-            IntakeMotor.set(-Constants.EndEffector.ScoreSpeed);
+            IntakeMotor.set(Constants.EndEffector.ScoreSpeed);
         }
     }
 
     public void CenterCoral(int dir) {
         CenteringMotor.set(Constants.EndEffector.CenteringSpeed * dir);
-        IntakeMotor.set(Constants.EndEffector.IntakeSpeed / 5);
     }
 
     public void StopCentering() {
         CenteringMotor.set(0);
-        IntakeMotor.set(0);
     }
 
     public void StopMotors() {
@@ -75,18 +71,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (getIntaken()) {
-            isIntaking = false;
-            IntakeMotor.set(0);
-            StopCentering();
-        }
-
         if (leftBeam.get() ^ rightBeam.get()) {
-            if (leftBeam.get()) {
-                CenterCoral(1);
-            } else {
-                CenterCoral(-1);
-            }
+            // CenterCoral(1);
+        } else {
+            StopCentering();
         }
 
         Logger.recordOutput("Subsystems/EndEffector/LeftBeam", (boolean) leftBeam.get());

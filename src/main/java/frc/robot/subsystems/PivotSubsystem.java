@@ -41,12 +41,12 @@ public class PivotSubsystem extends SubsystemBase {
     private DigitalInput botBreak = new DigitalInput(Ports.Pivot.BotLimitSwitch);
 
     private boolean atPosition = false;
-    private double targetAngle = -10;
+    private double targetAngle = 128;
     private double encoderOffset = 0;
 
-    private ArmFeedforward feedforward = new ArmFeedforward(0, 0.25, 0.02, 0);
-    private ProfiledPIDController pidController = new ProfiledPIDController(0.01, 0.0, 0.0,
-            new TrapezoidProfile.Constraints(90, 180));
+    private ArmFeedforward feedforward = new ArmFeedforward(0, 0.28, 0.0155, 0);
+    private ProfiledPIDController pidController = new ProfiledPIDController(0.06, 0.0, 0.0,
+            new TrapezoidProfile.Constraints(360, 720));
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
@@ -59,8 +59,7 @@ public class PivotSubsystem extends SubsystemBase {
     }
 
     public void setPivotTarget(double angle) {
-        targetAngle = DoubleUtils.clamp(angle, -10, 120);
-        System.out.println(targetAngle);
+        targetAngle = DoubleUtils.clamp(angle, -10, 128);
     }
 
     public double getPivotAngle() {
