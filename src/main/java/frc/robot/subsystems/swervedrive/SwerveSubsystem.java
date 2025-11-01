@@ -37,6 +37,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
+import ca.team4308.absolutelib.math.DoubleUtils;
 import ca.team4308.absolutelib.wrapper.LoggedTunableNumber;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -165,6 +166,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // When vision is enabled we must manually update odometry in SwerveDrive
     swerveDrive.updateOdometry();
     vision.updatePoseEstimation(swerveDrive);
+    vision.updateObjectOffset();
 
     // checkTunableValues();
 
@@ -374,7 +376,6 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void aimAtTarget(Supplier<Double> joyX, Supplier<Double> joyY) {
-    vision.updateObjectOffset();
     OptionalDouble yawDiff = vision.getObjectOffset().get();
     if (!yawDiff.isEmpty())
       swerveDrive.driveFieldOriented(
@@ -386,22 +387,15 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void driveTowardsTarget(Supplier<Double> throttle) {
-    vision.updateObjectOffset();
     OptionalDouble yawDiff = vision.getObjectOffset().get();
-    if (!yawDiff.isEmpty()) {
-      swerveDrive.drive(
-          getTargetSpeeds(
-              -throttle.get(),
-              0,
-              new Rotation2d(
-                  Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble()))));
-    } else {
-      swerveDrive.drive(
-          getTargetSpeeds(
-              -throttle.get(),
-              0,
-              new Rotation2d()));
-    }
+    System.out.println(throttle.get());
+    swerveDrive.drive(
+        getTargetSpeeds(
+            DoubleUtils.clamp(-throttle.get(), -0.7, 0),
+            0,
+            new Rotation2d(
+                Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble() + 2))));
+
   }
 
   // Swerve drive with Setpoint Generator from 254, implemented by PathPlanner

@@ -113,7 +113,7 @@ public class RazerWrapper {
     }
 
     public boolean getRightTriggerAsBoolean() {
-        return (joystick.getRawAxis(3) > 0.5);
+        return (joystick.getRawAxis(3) > 0.15);
     }
 
     public void setRumble(RumbleType type, double power) {

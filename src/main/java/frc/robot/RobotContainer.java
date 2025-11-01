@@ -110,7 +110,7 @@ public class RobotContainer {
                 m_ClimbSubsystem = new ClimbSubsystem();
 
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
-                ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem);
+                ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem, m_ClimbSubsystem);
                 OnlyIntakeCommand = new OnlyIntake(m_endEffectorSubsystem, m_pivotSubsystem);
                 SuperImportentCommand = new SuperImportentCommand(m_pivotSubsystem, m_endEffectorSubsystem);
 
@@ -145,10 +145,14 @@ public class RobotContainer {
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
                 driver.M2.onTrue(TogglePivotCommand);
-                // driver.A.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(-10)));
-                // driver.B.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(45)));
-                // driver.X.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(90)));
-                // driver.Y.onTrue(new InstantCommand(() -> m_pivotSubsystem.setPivotTarget(120)));
+                // driver.A.onTrue(new InstantCommand(() ->
+                // m_pivotSubsystem.setPivotTarget(-10)));
+                // driver.B.onTrue(new InstantCommand(() ->
+                // m_pivotSubsystem.setPivotTarget(45)));
+                // driver.X.onTrue(new InstantCommand(() ->
+                // m_pivotSubsystem.setPivotTarget(90)));
+                // driver.Y.onTrue(new InstantCommand(() ->
+                // m_pivotSubsystem.setPivotTarget(120)));
 
                 if (Robot.isSimulation()) {
                         driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
@@ -156,11 +160,10 @@ public class RobotContainer {
                 }
                 driver.M1.onTrue(ResetCommand);
 
-                driver.RightTriggerTrigger.and(() -> m_pivotSubsystem.atPosition())
+                driver.RightTriggerTrigger.onTrue(OnlyIntakeCommand)
                                 .whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
                                                 () -> deadZone(driver.getRightTrigger())),
                                                 drivebase));
-                driver.RightTriggerTrigger.onTrue(OnlyIntakeCommand);
 
                 driver.M3.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
@@ -170,8 +173,8 @@ public class RobotContainer {
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
                 driver.RB.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-                driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
-                driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
+                // driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                // driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
 
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);

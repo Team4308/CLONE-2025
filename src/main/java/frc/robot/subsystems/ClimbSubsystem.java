@@ -39,14 +39,12 @@ public class ClimbSubsystem extends SubsystemBase {
         motorSpeed = -Ports.Climb.speed;
     }
 
+    public void stop() {
+        motorSpeed = 0;
+    }
+
     @Override
     public void periodic() {
-        if (topLimit.get()) {
-            motorSpeed = Math.min(motorSpeed, 0);
-        } else if (botLimit.get()) {
-            motorSpeed = Math.max(motorSpeed, 0);
-        }
-
         armMotor.set(motorSpeed);
     }
 }

@@ -46,7 +46,7 @@ public class PivotSubsystem extends SubsystemBase {
 
     private ArmFeedforward feedforward = new ArmFeedforward(0, 0.28, 0.0155, 0);
     private ProfiledPIDController pidController = new ProfiledPIDController(0.06, 0.0, 0.0,
-            new TrapezoidProfile.Constraints(360, 720));
+            new TrapezoidProfile.Constraints(360, 500));
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
