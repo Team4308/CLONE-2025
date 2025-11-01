@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.RazerWrapper;
 import ca.team4308.absolutelib.math.DoubleUtils;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -62,13 +63,14 @@ public class RobotContainer {
         private final Trigger drivebaseAlignedTrigger;
         private final Trigger isIntakenTrigger;
         private final Trigger last15SecondsTrigger;
+        private final Trigger coralSpottedTrigger;
 
         // Converts driver input into a field-relative ChassisSpeeds that is controlled
         // by angular velocity.
         SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                         () -> driver.getLeftY() * -1,
                         () -> driver.getLeftX() * -1)
-                        .withControllerRotationAxis(() -> driver.getRightX() * -1)
+                        .withControllerRotationAxis(() -> driver.getRightX())
                         .deadband(Driver.DEADBAND)
                         .scaleTranslation(1.0)
                         .allianceRelativeControl(true);
@@ -117,6 +119,7 @@ public class RobotContainer {
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
                 last15SecondsTrigger = new Trigger(() -> Timer.getMatchTime() == 15);
+                coralSpottedTrigger = new Trigger(() -> drivebase.hasTarget());
 
                 configureNamedCommands();
                 configureDriverBindings();
@@ -184,8 +187,9 @@ public class RobotContainer {
         }
 
         private void configureOtherTriggers() {
-                // drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
+                drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
                 last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                coralSpottedTrigger.onTrue(OnlyIntakeCommand);
         }
 
         public void configureTeleopBindings() {

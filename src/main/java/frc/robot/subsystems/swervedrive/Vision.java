@@ -59,6 +59,7 @@ public class Vision {
   private Supplier<Pose2d> currentPose;
   private Field2d field2d;
   private double objectOffset = 0.0;
+  public boolean hasValidObject = false;
 
   PhotonCamera objCamera = new PhotonCamera("COLOR CAM");
 
@@ -147,6 +148,7 @@ public class Vision {
       for (PhotonTrackedTarget result : results) {
         if (result.getDetectedObjectClassID() == 1) {
           objectOffset = result.getYaw();
+          hasValidObject = true;
           changed = true;
           break;
         }
@@ -154,6 +156,7 @@ public class Vision {
     }
     if (!changed) {
       objectOffset = 0.0;
+      hasValidObject = false;
     }
     Logger.recordOutput("Object Offset", objectOffset);
   }
@@ -251,7 +254,7 @@ public class Vision {
     Logger.recordOutput("Vision Targets", poses.toArray(new Pose2d[0]));
 
     field2d.getObject("Vision Targets").setPoses(poses);
-    SmartDashboard.putData("Tracked Field", field2d);
+    SmartDashboard.putData("TrackedField", field2d);
   }
 
   /**
@@ -262,15 +265,15 @@ public class Vision {
      * Left Camera
      */
     FRONT_CAM("Frontcam_OV9281",
-        new Rotation3d(0, Math.toRadians(-15), 0),
-        new Translation3d(0.298254, 0, 0.226),
+        new Rotation3d(0, Math.toRadians(-25), 0),
+        new Translation3d(0.241, 0, 0.209),
         VecBuilder.fill(1, 1, 4), VecBuilder.fill(0.5, 0.5, 2)),
     /**
      * Right Camera
      */
     FUNNEL_CAM("Funnelcam_OV9281",
         new Rotation3d(0, Math.toRadians(20), 0),
-        new Translation3d(-0.220466, 0.1778, 1.037663),
+        new Translation3d(-0.235, 0, 0.996411),
         VecBuilder.fill(1, 1, 4), VecBuilder.fill(0.5, 0.5, 2));
 
     // Latency alert to use when high latency is detected.

@@ -34,7 +34,7 @@ public final class Constants {
 
         public static class Auton {
             public static class Angle {
-                public static final double kP = 5.0;
+                public static final double kP = 3.0;
                 public static final double kI = 0.0;
                 public static final double kD = 0.0;
             }
@@ -59,7 +59,6 @@ public final class Constants {
         public static final boolean INVERTED = false;
         public static final boolean BRAKE_MODE = true;
 
-
         public static final double scoreAngle = 90;
         public static final double intakeAngle = -11;
         public static final double restAngle = 120;
@@ -80,7 +79,6 @@ public final class Constants {
         public static final double SM_MAX_ACCEL = 360.0; // deg/s^2
         public static final double SM_ALLOWED_ERR = 1.0; // deg
 
-
         // FF Gains
         public static final double Pivot_kS = 0.2;
         public static final double Pivot_kG = 0.9;
@@ -96,8 +94,6 @@ public final class Constants {
         // Controller tolerances
         public static final double PivotPositionToleranceDeg = 1.0;
         public static final double PivotVelocityToleranceDegPerSec = 5.0;
-
-
 
     }
 

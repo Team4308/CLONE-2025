@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -175,9 +177,8 @@ public class SwerveSubsystem extends SubsystemBase {
     driverStationField.setRobotPose(getPose());
     SmartDashboard.putData("driverStationField", driverStationField);
 
-    // vision.updateVisionField();
+    vision.updateVisionField();
 
-    // SmartDashboard.putBoolean("Aligned?", isAligned());
     Logger.recordOutput("Swerve/Is Aligned?", isAligned());
     Logger.recordOutput("Swerve/Pose", getPose());
     Logger.recordOutput("Swerve/Velocity", getRobotVelocity());
@@ -361,6 +362,14 @@ public class SwerveSubsystem extends SubsystemBase {
     path.preventFlipping = true;
     Logger.recordOutput("Swerve/Path Goal", pose);
     Logger.recordOutput("Swerve/PID output", ALIGN_CONTROLLER.calculateRobotRelativeSpeeds(getPose(), goalState));
+
+    ArrayList<Pose2d> points = new ArrayList<>();
+    for (PathPoint state : path.getAllPathPoints()) {
+      points.add(new Pose2d(state.position, new Rotation2d(0)));
+    }
+
+    driverStationField.getObject("Path").setPoses(points);
+
     return AutoBuilder.followPath(path)
         .andThen(run(() -> swerveDrive.drive(ALIGN_CONTROLLER.calculateRobotRelativeSpeeds(getPose(), goalState))));
 
@@ -388,14 +397,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveTowardsTarget(Supplier<Double> throttle) {
     OptionalDouble yawDiff = vision.getObjectOffset().get();
-    System.out.println(throttle.get());
     swerveDrive.drive(
         getTargetSpeeds(
-            DoubleUtils.clamp(-throttle.get(), -0.7, 0),
+            DoubleUtils.clamp(throttle.get(), 0, 0.7),
             0,
             new Rotation2d(
                 Math.toRadians(getHeading().getDegrees() - yawDiff.getAsDouble() + 2))));
 
+  }
+
+  public boolean hasTarget() {
+    return vision.hasValidObject;
   }
 
   // Swerve drive with Setpoint Generator from 254, implemented by PathPlanner
