@@ -374,6 +374,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void aimAtTarget(Supplier<Double> joyX, Supplier<Double> joyY) {
+    vision.updateObjectOffset();
     OptionalDouble yawDiff = vision.getObjectOffset().get();
     if (!yawDiff.isEmpty())
       swerveDrive.driveFieldOriented(
@@ -385,6 +386,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void driveTowardsTarget(Supplier<Double> throttle) {
+    vision.updateObjectOffset();
     OptionalDouble yawDiff = vision.getObjectOffset().get();
     if (!yawDiff.isEmpty()) {
       swerveDrive.drive(

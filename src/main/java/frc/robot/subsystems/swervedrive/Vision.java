@@ -58,6 +58,7 @@ public class Vision {
   // Current pose from the pose estimator using wheel odometry.
   private Supplier<Pose2d> currentPose;
   private Field2d field2d;
+  private double objectOffset = 0.0;
 
   PhotonCamera objCamera = new PhotonCamera("COLOR CAM");
 
@@ -134,12 +135,26 @@ public class Vision {
   }
 
   public Supplier<OptionalDouble> getObjectOffset() {
-    var results = objCamera.getLatestResult();
-    if (results.hasTargets()) {
-      var target = results.getBestTarget();
-      return () -> OptionalDouble.of(target.getYaw());
+    return () -> OptionalDouble.of(objectOffset);
+  }
+
+  public void updateObjectOffset() {
+    var results = objCamera.getLatestResult().getTargets();
+
+    boolean changed = false;
+
+    if (!results.isEmpty()) {
+      for (PhotonTrackedTarget result : results) {
+        if (result.getDetectedObjectClassID() == 0) { // TODO: this eeds to be checked
+          objectOffset = result.getYaw();
+          changed = true;
+          break;
+        }
+      }
     }
-    return () -> OptionalDouble.empty();
+    if (!changed) {
+      objectOffset = 0.0;
+    }
   }
 
   /**
