@@ -9,10 +9,13 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.sound.sampled.Port;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.RazerWrapper;
+import ca.team4308.absolutelib.control.XBoxWrapper;
 import ca.team4308.absolutelib.math.DoubleUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,7 +54,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
         // Controllers
         private final RazerWrapper driver = new RazerWrapper(Ports.Joysticks.DRIVER);
-
+        private final XBoxWrapper teleop = new XBoxWrapper(Ports.Joysticks.OPERATOR);
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -195,11 +199,30 @@ public class RobotContainer {
 
         private void configureOtherTriggers() {
                 drivebaseAlignedTrigger.onTrue(OnlyScoreCommand);
-                last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                //last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
                 // coralSpottedTrigger.onTrue(OnlyIntakeCommand);
         }
 
         public void configureTeleopBindings() {
+                teleop.X.onTrue(new InstantCommand(() ->  {
+                        m_endEffectorSubsystem.setMotorSpeed(0.3);
+                }));
+                teleop.B.onTrue(new InstantCommand(() ->  {
+                        m_endEffectorSubsystem.setMotorSpeed(-0.3);
+                })
+                );
+
+                teleop.Y.onTrue(
+                        new InstantCommand(() ->  {
+                                m_pivotSubsystem.movePivot(Constants.Pivot.intakeAngle);
+                        })
+                );
+                teleop.A.onTrue(
+                        new InstantCommand(() ->  {
+                                m_pivotSubsystem.movePivot(Constants.Pivot.scoreAngle);
+                        })
+                );
+
 
         }
 

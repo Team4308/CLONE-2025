@@ -60,6 +60,10 @@ public class EndEffectorSubsystem extends SubsystemBase {
         CenteringMotor.set(Constants.EndEffector.CenteringSpeed * dir);
     }
 
+    public void setSpeed(double s) {
+        IntakeMotor.set(s);
+    }
+
     public void StopCentering() {
         CenteringMotor.set(0);
     }
