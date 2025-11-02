@@ -32,11 +32,11 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // Idk change this to have logic later
     public void climb() {
-        motorSpeed = Ports.Climb.speed;
+        motorSpeed = -Ports.Climb.speed;
     }
 
     public void release() {
-        motorSpeed = -Ports.Climb.speed;
+        motorSpeed = Ports.Climb.speed;
     }
 
     public void stop() {
@@ -45,6 +45,16 @@ public class ClimbSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (topLimit.get()) {
+            if (motorSpeed > 0) {
+                motorSpeed = 0;
+            }
+        } else if (botLimit.get()) {
+            if (motorSpeed < 0) {
+                motorSpeed = 0;
+            }
+        }
+
         armMotor.set(motorSpeed);
     }
 }

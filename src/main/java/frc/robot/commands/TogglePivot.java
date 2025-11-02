@@ -24,32 +24,16 @@ public class TogglePivot extends Command {
 
     @Override
     public void initialize() {
-        CommandScheduler.getInstance().cancelAll();
         if (!m_EndEffectorSubsystem.getIntaken()) {
-            intake().schedule();
+            OnlyIntake intakeCommand = new OnlyIntake(m_EndEffectorSubsystem, m_PivotSubsystem);
+            intakeCommand.schedule();
         } else {
-            score().schedule();
+            OnlyScore scoreCommand = new OnlyScore(m_EndEffectorSubsystem, m_PivotSubsystem);
+            scoreCommand.schedule();
         }
     }
 
-    private Command intake() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.intakeAngle)),
-                new InstantCommand(() -> m_EndEffectorSubsystem.Intake()),
-                new WaitUntilCommand(() -> m_EndEffectorSubsystem.getIntaken()),
-                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0.0)),
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
-                new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
-    }
-
-    private Command score() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.scoreAngle)),
-                new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()),
-                new InstantCommand(() -> m_EndEffectorSubsystem.Score()),
-                new WaitCommand(0.5),
-                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0)),
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
-                new WaitUntilCommand(() -> m_PivotSubsystem.atPosition()));
+    public boolean isFinished() {
+        return true;
     }
 }

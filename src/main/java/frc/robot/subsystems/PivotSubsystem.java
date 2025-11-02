@@ -29,6 +29,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Ports;
@@ -37,29 +38,25 @@ import frc.robot.Robot;
 public class PivotSubsystem extends SubsystemBase {
     public TalonFX m_pivotMotor = new TalonFX(Ports.Pivot.PivotMotor);
     private CANcoder m_pivotEncoder = new CANcoder(Ports.Pivot.PivotEncoder);
-    private DigitalInput topBreak = new DigitalInput(Ports.Pivot.TopLimitSwitch);
-    private DigitalInput botBreak = new DigitalInput(Ports.Pivot.BotLimitSwitch);
 
     private boolean atPosition = false;
     private double targetAngle = 128;
-    private double encoderOffset = 0;
+    private double encoderOffset = 107;
 
-    private ArmFeedforward feedforward = new ArmFeedforward(0, 0.28, 0.0155, 0);
+    private ArmFeedforward feedforward = new ArmFeedforward(0, 0.28, 0.0155, 0.01);
     private ProfiledPIDController pidController = new ProfiledPIDController(0.06, 0.0, 0.0,
-            new TrapezoidProfile.Constraints(360, 500));
+            new TrapezoidProfile.Constraints(500, 1000));
 
     public PivotSubsystem() {
         var talonFXConfigs = new TalonFXConfiguration();
         talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        encoderOffset = 107;
-
         m_pivotMotor.getConfigurator().apply(talonFXConfigs);
     }
 
-    public void setPivotTarget(double angle) {
-        targetAngle = DoubleUtils.clamp(angle, -10, 128);
+    public Command movePivot(double angle) {
+        return run(() -> targetAngle = DoubleUtils.clamp(angle, -10, 128)).until(() -> atPosition());
     }
 
     public double getPivotAngle() {
@@ -81,12 +78,6 @@ public class PivotSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         double currentAngle = getPivotAngle();
-
-        if (topBreak.get()) {
-            // encoderOffset = m_pivotEncoder.getPosition().getValueAsDouble() - 130;
-        } else if (botBreak.get()) {
-            // encoderOffset = m_pivotEncoder.getPosition().getValueAsDouble() - 5;
-        }
 
         atPosition = Math.abs(currentAngle - targetAngle) < 3;
 

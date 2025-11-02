@@ -11,7 +11,7 @@ public final class Constants {
             new Translation3d(Units.inchesToMeters(27), Units.inchesToMeters(27), Units.inchesToMeters(40)),
             ROBOT_MASS);
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-    public static final double MAX_SPEED = Units.feetToMeters(12.5);
+    public static final double MAX_SPEED = Units.feetToMeters(12.5);// should be 12.5
     // Maximum speed of the robot in meters per second, used to limit acceleration.
 
     public static final class LoggedDashboard {
@@ -24,11 +24,11 @@ public final class Constants {
 
         public static final class Align {
             public static final class Heading {
-                public static final double TOLERANCE = 1; // in degrees
+                public static final double TOLERANCE = 5; // in degrees
             }
 
             public static final class Translation {
-                public static final double TOLERANCE = Units.inchesToMeters(1.0);
+                public static final double TOLERANCE = Units.inchesToMeters(3.0);
             }
         }
 

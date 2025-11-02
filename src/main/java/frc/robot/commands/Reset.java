@@ -14,29 +14,19 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
 
-public class Reset extends Command {
-    private EndEffectorSubsystem m_EndEffectorSubsystem;
-    private PivotSubsystem m_PivotSubsystem;
-    private ClimbSubsystem m_ClimbSubsystem;
-
+public class Reset extends SequentialCommandGroup {
     public Reset(EndEffectorSubsystem m_EndEffectorSubsystem, PivotSubsystem m_PivotSubsystem,
             ClimbSubsystem m_ClimbSubsystem) {
-        this.m_EndEffectorSubsystem = m_EndEffectorSubsystem;
-        this.m_PivotSubsystem = m_PivotSubsystem;
-        this.m_ClimbSubsystem = m_ClimbSubsystem;
-    }
-
-    @Override
-    public void initialize() {
         CommandScheduler.getInstance().cancelAll();
-
-        res().schedule();
-    }
-
-    private Command res() {
-        return new ParallelCommandGroup(
-                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
-                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(0)),
-                new InstantCommand(() -> m_ClimbSubsystem.stop()));
+        addCommands(
+                new ParallelCommandGroup(m_PivotSubsystem.movePivot(Constants.Pivot.restAngle),
+                        new InstantCommand(
+                                () -> m_EndEffectorSubsystem.setMotorSpeed(Constants.EndEffector.ScoreSpeed)),
+                        new InstantCommand(() -> m_ClimbSubsystem.stop())),
+                new InstantCommand(() -> m_EndEffectorSubsystem.setMotorSpeed(Constants.EndEffector.ScoreSpeed)),
+                new WaitCommand(0.5),
+                new InstantCommand(() -> m_EndEffectorSubsystem.StopMotors()));
+        CommandScheduler.getInstance().cancelAll();
+        ;
     }
 }
