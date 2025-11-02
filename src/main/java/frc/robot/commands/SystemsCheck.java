@@ -43,7 +43,7 @@ public class SystemsCheck extends SequentialCommandGroup {
                                 new InstantCommand(() -> Logger.recordOutput("SystemsCheck/Status",
                                                 "Testing Intake Cycle...")),
 
-                                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.intakeAngle)),
+                                new InstantCommand(() -> m_PivotSubsystem.movePivot(Constants.Pivot.intakeAngle)),
                                 new WaitUntilCommand(m_PivotSubsystem::atPosition),
                                 new InstantCommand(m_EndEffectorSubsystem::Intake),
                                 new WaitUntilCommand(m_EndEffectorSubsystem::getIntaken).withTimeout(10.0),
@@ -56,7 +56,7 @@ public class SystemsCheck extends SequentialCommandGroup {
                                         }
                                 }),
 
-                                new InstantCommand(() -> m_PivotSubsystem.setPivotTarget(Constants.Pivot.restAngle)),
+                                new InstantCommand(() -> m_PivotSubsystem.movePivot(Constants.Pivot.restAngle)),
                                 new WaitUntilCommand(m_PivotSubsystem::atPosition),
                                 new InstantCommand(
                                                 () -> Logger.recordOutput("SystemsCheck/Status", "Testing Release...")),

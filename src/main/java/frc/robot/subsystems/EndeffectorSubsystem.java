@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Ports;
@@ -36,21 +37,23 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public boolean getIntaken() {
         if (Robot.isSimulation()) {
-            return simIntaking;
+            return true;
         }
-        return rightBeam.get();
+        return rightBeam.get(); // should be right or left but we are missing one
     }
 
-    public void Intake() {
-        if (!getIntaken()) {
-            IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
-        }
+    public Command Intake() {
+        return run(() -> {
+            if (!getIntaken()) {
+                IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
+            }
+        }).until(() -> getIntaken());
     }
 
-    public void Score() {
-        if (getIntaken()) {
+    public Command Score() {
+        return run(() -> {
             IntakeMotor.set(Constants.EndEffector.ScoreSpeed);
-        }
+        }).until(() -> !getIntaken());
     }
 
     public void CenterCoral(int dir) {

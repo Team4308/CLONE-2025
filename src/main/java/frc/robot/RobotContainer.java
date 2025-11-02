@@ -6,12 +6,15 @@ package frc.robot;
 
 import java.io.File;
 import java.lang.management.OperatingSystemMXBean;
+import java.util.Arrays;
+import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.RazerWrapper;
 import ca.team4308.absolutelib.math.DoubleUtils;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -24,13 +27,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
+import frc.robot.FieldLayout.HP_DEPENDENT;
+import frc.robot.FieldLayout.REEF_DEPENDENT;
+import frc.robot.commands.IntakeAndMove;
 import frc.robot.commands.OnlyIntake;
+import frc.robot.commands.OnlyScore;
 import frc.robot.commands.Reset;
 import frc.robot.commands.SuperImportentCommand;
 import frc.robot.commands.SystemsCheck;
 import frc.robot.commands.TogglePivot;
+import frc.robot.commands.Autons.AtHomeAuton;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
@@ -50,10 +59,16 @@ public class RobotContainer {
 
         private final TogglePivot TogglePivotCommand;
         private final Reset ResetCommand;
-        private final OnlyIntake OnlyIntakeCommand;
-        private final SuperImportentCommand SuperImportentCommand;
+        private final OnlyScore OnlyScoreCommand;
+        private final IntakeAndMove IntakeAndMoveCommand;
 
-        private final SendableChooser<Command> autoChooser;
+        private SendableChooser<Command> place1;
+        private SendableChooser<Command> pickup1;
+        private SendableChooser<Command> place2;
+        private SendableChooser<Command> pickup2;
+        private SendableChooser<Command> place3;
+        private SendableChooser<Command> pickup3;
+        private SendableChooser<Command> place4;
 
         private final Simulation m_simulation;
         private final PivotSubsystem m_pivotSubsystem;
@@ -61,9 +76,7 @@ public class RobotContainer {
         private final ClimbSubsystem m_ClimbSubsystem;
 
         private final Trigger drivebaseAlignedTrigger;
-        private final Trigger isIntakenTrigger;
         private final Trigger last15SecondsTrigger;
-        private final Trigger coralSpottedTrigger;
 
         // Converts driver input into a field-relative ChassisSpeeds that is controlled
         // by angular velocity.
@@ -113,21 +126,25 @@ public class RobotContainer {
 
                 TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
                 ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem, m_ClimbSubsystem);
-                OnlyIntakeCommand = new OnlyIntake(m_endEffectorSubsystem, m_pivotSubsystem);
-                SuperImportentCommand = new SuperImportentCommand(m_pivotSubsystem, m_endEffectorSubsystem);
+                OnlyScoreCommand = new OnlyScore(m_endEffectorSubsystem, m_pivotSubsystem);
+                IntakeAndMoveCommand = new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
-                isIntakenTrigger = new Trigger(m_endEffectorSubsystem::getIntaken);
                 last15SecondsTrigger = new Trigger(() -> DriverStation.getMatchTime() <= 100);
-                coralSpottedTrigger = new Trigger(() -> drivebase.hasTarget());
 
-                configureNamedCommands();
+                configureAutons();
                 configureDriverBindings();
                 configureOtherTriggers();
 
                 DriverStation.silenceJoystickConnectionWarning(true);
-                autoChooser = AutoBuilder.buildAutoChooser();
-                SmartDashboard.putData("Auto Chooser", autoChooser);
+
+                SmartDashboard.putData("Place 1", place1);
+                SmartDashboard.putData("Pickup 1", pickup1);
+                SmartDashboard.putData("Place 2", place2);
+                SmartDashboard.putData("Pickip 2", pickup2);
+                SmartDashboard.putData("Place 3", place3);
+                SmartDashboard.putData("Pickup 3", pickup3);
+                SmartDashboard.putData("Place 4", place4);
 
                 m_simulation.setupSubsystems(m_pivotSubsystem, m_endEffectorSubsystem);
         }
@@ -147,28 +164,16 @@ public class RobotContainer {
                 Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
-                driver.M2.onTrue(TogglePivotCommand);
-                // driver.A.onTrue(new InstantCommand(() ->
-                // m_pivotSubsystem.setPivotTarget(-10)));
-                // driver.B.onTrue(new InstantCommand(() ->
-                // m_pivotSubsystem.setPivotTarget(45)));
-                // driver.X.onTrue(new InstantCommand(() ->
-                // m_pivotSubsystem.setPivotTarget(90)));
-                // driver.Y.onTrue(new InstantCommand(() ->
-                // m_pivotSubsystem.setPivotTarget(120)));
-
-                driver.Y.onTrue(drivebase.turn180());
-
-                if (Robot.isSimulation()) {
-                        driver.M1.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
-                        driver.M1.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
-                }
                 driver.M1.onTrue(ResetCommand);
 
-                driver.RightTriggerTrigger.onTrue(OnlyIntakeCommand)
-                                .whileTrue(Commands.run(() -> drivebase.driveTowardsTarget(
-                                                () -> deadZone(driver.getRightTrigger())),
-                                                drivebase));
+                driver.M2.onTrue(TogglePivotCommand);
+
+                if (Robot.isSimulation()) {
+                        driver.X.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
+                        driver.X.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
+                }
+
+                driver.RightTriggerTrigger.whileTrue(IntakeAndMoveCommand);
 
                 driver.M3.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
@@ -189,16 +194,73 @@ public class RobotContainer {
         }
 
         private void configureOtherTriggers() {
-                drivebaseAlignedTrigger.and(isIntakenTrigger).onTrue(TogglePivotCommand);
+                drivebaseAlignedTrigger.onTrue(OnlyScoreCommand);
                 last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
-                coralSpottedTrigger.onTrue(OnlyIntakeCommand);
+                // coralSpottedTrigger.onTrue(OnlyIntakeCommand);
         }
 
         public void configureTeleopBindings() {
 
         }
 
-        public void configureNamedCommands() {
+        public void configureAutons() {
+                place1 = new SendableChooser<Command>();
+                pickup1 = new SendableChooser<Command>();
+                place2 = new SendableChooser<Command>();
+                pickup2 = new SendableChooser<Command>();
+                place3 = new SendableChooser<Command>();
+                pickup3 = new SendableChooser<Command>();
+                place4 = new SendableChooser<Command>();
+
+                // PLACE CHOOSERS: all REEF_DEPENDENT poses
+                List<SendableChooser<Command>> placeChoosers = Arrays.asList(place1, place2, place3, place4);
+                Pose2d[] reefPoses = {
+                                REEF_DEPENDENT.A(),
+                                REEF_DEPENDENT.B(),
+                                REEF_DEPENDENT.C(),
+                                REEF_DEPENDENT.D(),
+                                REEF_DEPENDENT.E(),
+                                REEF_DEPENDENT.F(),
+                                REEF_DEPENDENT.G(),
+                                REEF_DEPENDENT.H(),
+                                REEF_DEPENDENT.I(),
+                                REEF_DEPENDENT.J(),
+                                REEF_DEPENDENT.K(),
+                                REEF_DEPENDENT.L()
+                };
+                String[] poseNames = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L" };
+
+                for (SendableChooser<Command> chooser : placeChoosers) {
+                        for (int i = 0; i < reefPoses.length; i++) {
+                                if (i == 0) {
+                                        chooser.setDefaultOption("Place " + poseNames[i],
+                                                        drivebase.driveToPose(reefPoses[i]));
+                                } else {
+                                        chooser.addOption("Place " + poseNames[i], drivebase.driveToPose(reefPoses[i]));
+                                }
+                        }
+                }
+
+                // PICKUP CHOOSERS: all HP_DEPENDENT poses
+                List<SendableChooser<Command>> pickupChoosers = Arrays.asList(pickup1, pickup2, pickup3);
+                Pose2d[] hpPoses = {
+                                HP_DEPENDENT.HP_FROM_LEFT(),
+                                HP_DEPENDENT.HP_FROM_RIGHT(),
+                                HP_DEPENDENT.HP_LEFT_FROM_MID(),
+                                HP_DEPENDENT.HP_RIGHT_FROM_MID()
+                };
+                String[] hpNames = { "From Left", "From Right", "Left From Mid", "Right From Mid" };
+
+                for (SendableChooser<Command> chooser : pickupChoosers) {
+                        for (int i = 0; i < hpPoses.length; i++) {
+                                if (i == 0) {
+                                        chooser.setDefaultOption("HP " + hpNames[i], drivebase.driveToPose(hpPoses[i]));
+                                } else {
+                                        chooser.addOption("HP " + hpNames[i], drivebase.driveToPose(hpPoses[i]));
+                                }
+                        }
+                }
+
         }
 
         /**
@@ -207,7 +269,19 @@ public class RobotContainer {
          * @return the command to run in autonomous
          */
         public Command getAutonomousCommand() {
-                return autoChooser.getSelected();
+                return new SequentialCommandGroup(place1.getSelected().until(() -> drivebase.isAligned()),
+                                pickup1.getSelected(),
+                                new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase)
+                                                .until(() -> m_endEffectorSubsystem.getIntaken()),
+                                place2.getSelected().until(() -> drivebase.isAligned()),
+                                pickup2.getSelected(),
+                                new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase)
+                                                .until(() -> m_endEffectorSubsystem.getIntaken()),
+                                place3.getSelected().until(() -> drivebase.isAligned()),
+                                pickup3.getSelected(),
+                                new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase)
+                                                .until(() -> m_endEffectorSubsystem.getIntaken()),
+                                place4.getSelected().until(() -> drivebase.isAligned()));
         }
 
         public void robotPeriodic() {
@@ -235,12 +309,5 @@ public class RobotContainer {
 
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
-        }
-
-        private static double deadZone(double integer) {
-                if (Math.abs(integer) < 0.1) {
-                        integer = 0;
-                }
-                return integer;
         }
 }
