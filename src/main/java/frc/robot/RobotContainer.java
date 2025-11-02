@@ -5,7 +5,6 @@
 package frc.robot;
 
 import java.io.File;
-import java.lang.management.OperatingSystemMXBean;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,33 +12,25 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.RazerWrapper;
-import ca.team4308.absolutelib.math.DoubleUtils;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
 import frc.robot.FieldLayout.HP_DEPENDENT;
 import frc.robot.FieldLayout.REEF_DEPENDENT;
 import frc.robot.commands.IntakeAndMove;
-import frc.robot.commands.OnlyIntake;
 import frc.robot.commands.OnlyScore;
 import frc.robot.commands.Reset;
-import frc.robot.commands.SuperImportentCommand;
 import frc.robot.commands.SystemsCheck;
 import frc.robot.commands.TogglePivot;
-import frc.robot.commands.Autons.AtHomeAuton;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
@@ -69,6 +60,8 @@ public class RobotContainer {
         private SendableChooser<Command> place3;
         private SendableChooser<Command> pickup3;
         private SendableChooser<Command> place4;
+
+        private final SendableChooser<Command> autoChooser;
 
         private final Simulation m_simulation;
         private final PivotSubsystem m_pivotSubsystem;
@@ -132,7 +125,7 @@ public class RobotContainer {
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 last15SecondsTrigger = new Trigger(() -> DriverStation.getMatchTime() <= 100);
 
-                configureAutons();
+                //configureAutons();
                 configureDriverBindings();
                 configureOtherTriggers();
 
@@ -147,6 +140,8 @@ public class RobotContainer {
                 SmartDashboard.putData("Place 4", place4);
 
                 m_simulation.setupSubsystems(m_pivotSubsystem, m_endEffectorSubsystem);
+                autoChooser = AutoBuilder.buildAutoChooser();
+                SmartDashboard.putData("Auto Chooser", autoChooser);
         }
 
         private void configureDriverBindings() {
@@ -269,6 +264,7 @@ public class RobotContainer {
          * @return the command to run in autonomous
          */
         public Command getAutonomousCommand() {
+                /* 
                 return new SequentialCommandGroup(place1.getSelected().until(() -> drivebase.isAligned()),
                                 pickup1.getSelected(),
                                 new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase)
@@ -282,6 +278,9 @@ public class RobotContainer {
                                 new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase)
                                                 .until(() -> m_endEffectorSubsystem.getIntaken()),
                                 place4.getSelected().until(() -> drivebase.isAligned()));
+
+                */
+                return autoChooser.getSelected();
         }
 
         public void robotPeriodic() {
