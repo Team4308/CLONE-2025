@@ -75,6 +75,8 @@ public class PivotSubsystem extends SubsystemBase {
         return atPosition;
     }
 
+
+
     @Override
     public void periodic() {
         double currentAngle = getPivotAngle();

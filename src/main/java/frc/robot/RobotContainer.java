@@ -8,10 +8,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sound.sampled.Port;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import ca.team4308.absolutelib.control.RazerWrapper;
 import ca.team4308.absolutelib.control.XBoxWrapper;
@@ -20,7 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,11 +26,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Driver;
 import frc.robot.FieldLayout.HP_DEPENDENT;
 import frc.robot.FieldLayout.REEF_DEPENDENT;
-import frc.robot.commands.IntakeAndMove;
-import frc.robot.commands.OnlyScore;
-import frc.robot.commands.Reset;
-import frc.robot.commands.SystemsCheck;
-import frc.robot.commands.TogglePivot;
+// import frc.robot.commands.IntakeAndMove;
+// import frc.robot.commands.OnlyScore;
+// import frc.robot.commands.Reset;
+// import frc.robot.commands.SystemsCheck;
+// import frc.robot.commands.TogglePivot;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
@@ -52,10 +48,10 @@ public class RobotContainer {
 
         // Commands
 
-        private final TogglePivot TogglePivotCommand;
-        private final Reset ResetCommand;
-        private final OnlyScore OnlyScoreCommand;
-        private final IntakeAndMove IntakeAndMoveCommand;
+        // private final TogglePivot TogglePivotCommand;
+        // private final Reset ResetCommand;
+        // private final OnlyScore OnlyScoreCommand;
+        // private final IntakeAndMove IntakeAndMoveCommand;
 
         private SendableChooser<Command> place1;
         private SendableChooser<Command> pickup1;
@@ -121,10 +117,10 @@ public class RobotContainer {
                 m_endEffectorSubsystem = new EndEffectorSubsystem();
                 m_ClimbSubsystem = new ClimbSubsystem();
 
-                TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
-                ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem, m_ClimbSubsystem);
-                OnlyScoreCommand = new OnlyScore(m_endEffectorSubsystem, m_pivotSubsystem);
-                IntakeAndMoveCommand = new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase);
+                // TogglePivotCommand = new TogglePivot(m_endEffectorSubsystem, m_pivotSubsystem);
+                // ResetCommand = new Reset(m_endEffectorSubsystem, m_pivotSubsystem, m_ClimbSubsystem);
+                // OnlyScoreCommand = new OnlyScore(m_endEffectorSubsystem, m_pivotSubsystem);
+                // IntakeAndMoveCommand = new IntakeAndMove(m_endEffectorSubsystem, m_pivotSubsystem, drivebase);
 
                 drivebaseAlignedTrigger = new Trigger(drivebase::isAligned);
                 last15SecondsTrigger = new Trigger(() -> DriverStation.getMatchTime() <= 100);
@@ -135,13 +131,13 @@ public class RobotContainer {
 
                 DriverStation.silenceJoystickConnectionWarning(true);
 
-                SmartDashboard.putData("Place 1", place1);
-                SmartDashboard.putData("Pickup 1", pickup1);
-                SmartDashboard.putData("Place 2", place2);
-                SmartDashboard.putData("Pickip 2", pickup2);
-                SmartDashboard.putData("Place 3", place3);
-                SmartDashboard.putData("Pickup 3", pickup3);
-                SmartDashboard.putData("Place 4", place4);
+                // SmartDashboard.putData("Place 1", place1);
+                // SmartDashboard.putData("Pickup 1", pickup1);
+                // SmartDashboard.putData("Place 2", place2);
+                // SmartDashboard.putData("Pickip 2", pickup2);
+                // SmartDashboard.putData("Place 3", place3);
+                // SmartDashboard.putData("Pickup 3", pickup3);
+                // SmartDashboard.putData("Place 4", place4);
 
                 m_simulation.setupSubsystems(m_pivotSubsystem, m_endEffectorSubsystem);
                 autoChooser = AutoBuilder.buildAutoChooser();
@@ -163,16 +159,15 @@ public class RobotContainer {
                 Command driveFieldOrientedAnglularVelocityKeyboard = drivebase
                                 .driveFieldOriented(driveAngularVelocityKeyboard);
 
-                driver.M1.onTrue(ResetCommand);
 
-                driver.M2.onTrue(TogglePivotCommand);
+                //driver.M2.onTrue(TogglePivotCommand);
 
                 if (Robot.isSimulation()) {
                         driver.X.onTrue(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = true));
                         driver.X.onFalse(new InstantCommand(() -> m_endEffectorSubsystem.simIntaking = false));
                 }
 
-                driver.RightTriggerTrigger.whileTrue(IntakeAndMoveCommand);
+                //driver.RightTriggerTrigger.whileTrue(IntakeAndMoveCommand);
 
                 driver.M3.whileTrue(drivebase.updateClosestReefPoses()
                                 .andThen(drivebase.driveToPose(() -> drivebase.nearestPoseToLeftReef)));
@@ -182,8 +177,8 @@ public class RobotContainer {
                 driver.LB.onTrue((Commands.runOnce(drivebase::zeroGyro)));
                 driver.RB.whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-                driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
-                driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
+                //driver.M5.onTrue(new InstantCommand(m_ClimbSubsystem::release));
+                //driver.M6.onTrue(new InstantCommand(m_ClimbSubsystem::climb));
 
                 if (RobotBase.isSimulation()) {
                         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityKeyboard);
@@ -193,7 +188,7 @@ public class RobotContainer {
         }
 
         private void configureOtherTriggers() {
-                drivebaseAlignedTrigger.onTrue(OnlyScoreCommand);
+                //drivebaseAlignedTrigger.onTrue(OnlyScoreCommand);
                 //last15SecondsTrigger.onTrue(new InstantCommand(m_ClimbSubsystem::release));
                 // coralSpottedTrigger.onTrue(OnlyIntakeCommand);
         }
@@ -201,11 +196,15 @@ public class RobotContainer {
         public void configureTeleopBindings() {
                 teleop.X.onTrue(new InstantCommand(() ->  {
                         m_endEffectorSubsystem.setMotorSpeed(0.3);
+                })).onFalse(new InstantCommand(() ->  {
+                        m_endEffectorSubsystem.setMotorSpeed(0);
                 }));
                 teleop.B.onTrue(new InstantCommand(() ->  {
                         m_endEffectorSubsystem.setMotorSpeed(-0.3);
                 })
-                );
+                ).onFalse(new InstantCommand(() ->  {
+                        m_endEffectorSubsystem.setMotorSpeed(0);
+                }));
 
                 teleop.Y.onTrue(
                         new InstantCommand(() ->  {
@@ -217,6 +216,8 @@ public class RobotContainer {
                                 m_pivotSubsystem.movePivot(Constants.Pivot.scoreAngle);
                         })
                 );
+                
+                //teleop.LB.onTrue(ResetCommand);
 
 
         }
@@ -324,10 +325,10 @@ public class RobotContainer {
                 driver.setRumble(RumbleType.kBothRumble, 0);
         }
 
-        public void runSystemsCheck() {
+        // public void runSystemsCheck() {
 
-                new SystemsCheck(m_endEffectorSubsystem, m_pivotSubsystem, drivebase, m_ClimbSubsystem).schedule();
-        }
+        //         new SystemsCheck(m_endEffectorSubsystem, m_pivotSubsystem, drivebase, m_ClimbSubsystem).schedule();
+        // }
 
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
