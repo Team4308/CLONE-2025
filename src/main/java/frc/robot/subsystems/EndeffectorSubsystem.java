@@ -18,6 +18,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public TalonFX IntakeMotor = new TalonFX(Ports.EndEffector.IntakeMotor);
     public TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
+    public DigitalInput beambreak = new DigitalInput(0);
     
     public EndEffectorSubsystem() {
         var slot0Configs = new Slot0Configs();
