@@ -18,9 +18,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public TalonFX IntakeMotor = new TalonFX(Ports.EndEffector.IntakeMotor);
     public TalonFX CenteringMotor = new TalonFX(Ports.EndEffector.CenteringMotor);
-    //private DigitalInput leftBeam = new DigitalInput(Ports.EndEffector.leftDIO);
-    //private DigitalInput rightBeam = new DigitalInput(Ports.EndEffector.rightDIO);
-
+    
     public EndEffectorSubsystem() {
         var slot0Configs = new Slot0Configs();
         slot0Configs.kS = 0.1; // Add 0.1 V output to overcome static friction
@@ -33,28 +31,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     }
 
-    public boolean simIntaking = false;
-
-    // public boolean getIntaken() {
-    //     if (Robot.isSimulation()) {
-    //         return true;
-    //     }
-    //     return rightBeam.get(); // should be right or left but we are missing one
-    // }
-
-    // public Command Intake() {
-    //     return run(() -> {
-    //         if (!getIntaken()) {
-    //             IntakeMotor.set(Constants.EndEffector.IntakeSpeed);
-    //         }
-    //     }).until(() -> getIntaken());
-    // }
-
-    // public Command Score() {
-    //     return run(() -> {
-    //         IntakeMotor.set(Constants.EndEffector.ScoreSpeed);
-    //     }).until(() -> !getIntaken());
-    // }
 
     public void CenterCoral(int dir) {
         CenteringMotor.set(Constants.EndEffector.CenteringSpeed * dir);
@@ -79,15 +55,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // if (leftBeam.get() ^ rightBeam.get()) {
-        //     // CenterCoral(1);
-        // } else {
-        //     StopCentering();
-        // }
 
-        // Logger.recordOutput("Subsystems/EndEffector/LeftBeam", (boolean) leftBeam.get());
-        // Logger.recordOutput("Subsystems/EndEffector/RightBeam", (boolean) rightBeam.get());
-        // Logger.recordOutput("Subsystems/EndEffector/Intaken", getIntaken());
         Logger.recordOutput("Subsystems/EndEffector/IntakeVoltage", IntakeMotor.getMotorVoltage().getValueAsDouble());
     }
 
